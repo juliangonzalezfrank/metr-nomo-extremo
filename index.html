@@ -349,28 +349,46 @@ function stopPolymeter(){
 }
 function startPolymeterScheduler(){
  const tempo=bpm($('pmTempo').value);
- if(!polymeterRows.length){setStatus('pmStatus','Agrega al menos un compás antes de iniciar.');return}
- polymeterLanes=polymeterRows.map((m,i)=>({...m,i,next:ac.currentTime+.06,beat:0,continuous:false}));
+ if(!polymeterRows.length){setStatus('pmStatus','Agrega al menos un compás antes de iniciar.');polymeterActive=false;return}
  const colors=[650,850,1050,1250,1450,1650];
+ polymeterLanes=polymeterRows.map((m,i)=>({
+  num:m.num,den:m.den,i,beat:0,
+  next:ac.currentTime+.10,
+  interval:60/(tempo*4/m.den),
+  continuous:(tempo>=1500 || tempo*4/m.den/60>=25)
+ }));
  polymeterLanes.forEach(l=>{
-  const pulseRate=tempo*4/l.den/60;
-  if(tempo>=1500||pulseRate>=25){l.continuous=true;polymeterOscs.push(sustained(Math.min(18000,Math.max(20,pulseRate)),.045))}
+  if(l.continuous){
+   const pulseRate=tempo*4/l.den/60;
+   polymeterOscs.push(sustained(Math.min(18000,Math.max(20,pulseRate)),.045));
+  }
  });
  setStatus('pmStatus',`Polimetría activa · ${polymeterLanes.length} compases simultáneos · ${tempo} BPM.`);
  function tick(){
   if(!polymeterActive)return;
-  const now=ac.currentTime;
-  polymeterLanes.forEach(l=>{
-   const pulseRate=tempo*4/l.den/60;
-   if(l.continuous||pulseRate>=25)return;
-   const interval=60/pulseRate;
-   while(l.next<now+AHEAD){
-    const isOne=l.beat===0,isMid=l.num>=6&&l.num%3===0&&l.beat===l.num/2;
-    clickAt(l.next,isOne?1800:colors[l.i],.012,isOne?.86:(isMid?.55:.30));
-    l.next+=interval;l.beat=(l.beat+1)%l.num;
+  try{
+   if(ac.state!=='running'){
+    ac.resume().catch(()=>{});
+    polymeterTimer=setTimeout(tick,50);
+    return;
    }
-  });
-  polymeterTimer=setTimeout(tick,LOOK);
+   const now=ac.currentTime;
+   for(const l of polymeterLanes){
+    if(l.continuous)continue;
+    // Mantiene cada compás independiente: su pulso continúa aunque los ciclos de acento sean distintos.
+    while(l.next < now + AHEAD){
+     const isOne=l.beat===0;
+     const isMid=l.num>=6&&l.num%3===0&&l.beat===l.num/2;
+     clickAt(l.next,isOne?1800:colors[l.i],.014,isOne?.88:(isMid?.58:.34));
+     l.next += l.interval;
+     l.beat=(l.beat+1)%l.num;
+    }
+   }
+   polymeterTimer=setTimeout(tick,20);
+  }catch(err){
+   polymeterActive=false;
+   setStatus('pmStatus','Error durante la polimetría: '+(err&&err.message?err.message:'fallo de audio'));
+  }
  }
  tick();
 }
@@ -401,28 +419,45 @@ function stopPolytempo(){
  polytempoActive=false;if(polytempoTimer!==null)clearTimeout(polytempoTimer);polytempoTimer=null;stopOscList(polytempoOscs);polytempoLanes=[];
 }
 function startPolytempoScheduler(){
- if(!polytempoRows.length){setStatus('ptStatus','Agrega al menos un tempo antes de iniciar.');return}
- polytempoLanes=polytempoRows.map((m,i)=>({...m,i,next:ac.currentTime+.06,beat:0,continuous:false}));
+ if(!polytempoRows.length){setStatus('ptStatus','Agrega al menos un tempo antes de iniciar.');polytempoActive=false;return}
  const colors=[700,900,1100,1300,1500,1700];
+ polytempoLanes=polytempoRows.map((m,i)=>({
+  ...m,i,beat:0,
+  next:ac.currentTime+.10,
+  interval:60/(m.tempo*4/m.den),
+  continuous:(m.tempo>=1500 || m.tempo*4/m.den/60>=25)
+ }));
  polytempoLanes.forEach(l=>{
-  const pulseRate=l.tempo*4/l.den/60;
-  if(l.tempo>=1500||pulseRate>=25){l.continuous=true;polytempoOscs.push(sustained(Math.min(18000,Math.max(20,pulseRate)),.04))}
+  if(l.continuous){
+   const pulseRate=l.tempo*4/l.den/60;
+   polytempoOscs.push(sustained(Math.min(18000,Math.max(20,pulseRate)),.04));
+  }
  });
  setStatus('ptStatus',`Politempo activo · ${polytempoLanes.length} tempos simultáneos: ${polytempoLanes.map(l=>l.tempo).join(' / ')} BPM.`);
  function tick(){
   if(!polytempoActive)return;
-  const now=ac.currentTime;
-  polytempoLanes.forEach(l=>{
-   const pulseRate=l.tempo*4/l.den/60;
-   if(l.continuous||pulseRate>=25)return;
-   const interval=60/pulseRate;
-   while(l.next<now+AHEAD){
-    const isOne=l.beat===0,isMid=l.num>=6&&l.num%3===0&&l.beat===l.num/2;
-    clickAt(l.next,isOne?1900:colors[l.i],.012,isOne?.86:(isMid?.55:.30));
-    l.next+=interval;l.beat=(l.beat+1)%l.num;
+  try{
+   if(ac.state!=='running'){
+    ac.resume().catch(()=>{});
+    polytempoTimer=setTimeout(tick,50);
+    return;
    }
-  });
-  polytempoTimer=setTimeout(tick,LOOK);
+   const now=ac.currentTime;
+   for(const l of polytempoLanes){
+    if(l.continuous)continue;
+    while(l.next < now + AHEAD){
+     const isOne=l.beat===0;
+     const isMid=l.num>=6&&l.num%3===0&&l.beat===l.num/2;
+     clickAt(l.next,isOne?1900:colors[l.i],.014,isOne?.88:(isMid?.58:.34));
+     l.next += l.interval;
+     l.beat=(l.beat+1)%l.num;
+    }
+   }
+   polytempoTimer=setTimeout(tick,20);
+  }catch(err){
+   polytempoActive=false;
+   setStatus('ptStatus','Error durante el politempo: '+(err&&err.message?err.message:'fallo de audio'));
+  }
  }
  tick();
 }
