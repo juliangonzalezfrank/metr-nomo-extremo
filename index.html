@@ -1,253 +1,375 @@
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101218">
-<title>Metrónomo extremo · 50,000 BPM</title>
+<title>Metrónomo Extremo 50K · Estudio rítmico</title>
 <style>
+:root{color-scheme:dark;--bg:#101218;--panel:#1c2029;--line:#363c49;--muted:#b9bfca;--accent:#f2f3f6;--green:#b8e4c8;--blue:#8cc8ff}
 *{box-sizing:border-box}
-body{margin:0;padding:22px 16px 40px;max-width:720px;margin-inline:auto;background:#101218;color:#f4f5f7;font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-h1{font-size:1.9rem;margin:0 0 8px}
-p{color:#b9bfca;line-height:1.45}
-.panel{background:#1c2029;border:1px solid #363c49;border-radius:16px;padding:17px;margin:15px 0}
-.big{font-size:clamp(2.5rem,12vw,4.2rem);font-weight:800;letter-spacing:-.04em;overflow-wrap:anywhere}
-label{display:block;font-weight:650;margin:14px 0 7px}
-input[type=range]{width:100%;min-height:35px;accent-color:#fff}
-input[type=number]{width:100%;padding:13px;border:1px solid #4b5261;border-radius:10px;background:#11141b;color:#fff;font-size:18px}
-button{border:0;border-radius:11px;padding:14px 16px;margin:8px 7px 0 0;font-size:16px;font-weight:750;background:#f2f3f6;color:#171920;cursor:pointer}
+body{margin:0;padding:20px 14px 48px;max-width:900px;margin-inline:auto;background:var(--bg);color:#f4f5f7;font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+h1{font-size:clamp(1.7rem,6vw,2.4rem);line-height:1.05;margin:0 0 8px}
+h2{font-size:1.3rem;margin:0 0 8px}
+h3{font-size:1.02rem;margin:0 0 8px}
+p{color:var(--muted);line-height:1.45}
+header{padding:6px 2px 14px}
+.eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:800}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
+.big{font-size:clamp(2.5rem,12vw,4.2rem);font-weight:850;letter-spacing:-.045em;overflow-wrap:anywhere;line-height:1.05}
+label{display:block;font-weight:700;margin:12px 0 6px}
+input,select{font:inherit}
+input[type=range]{width:100%;min-height:34px;accent-color:#fff}
+input[type=number],select{width:100%;padding:11px 12px;border:1px solid #4b5261;border-radius:10px;background:#11141b;color:#fff;font-size:16px;min-width:0}
+input[type=checkbox]{width:20px;height:20px;accent-color:#fff;vertical-align:middle}
+button{border:0;border-radius:11px;padding:13px 15px;margin:8px 7px 0 0;font-size:15px;font-weight:800;background:var(--accent);color:#171920;cursor:pointer}
 button.secondary{background:#3a4050;color:#fff}
-.status{min-height:1.5em;color:#b8e4c8;margin-top:12px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button.danger{background:#6e3039;color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+.status{min-height:1.5em;color:var(--green);margin-top:10px;overflow-wrap:anywhere}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.field{min-width:0}
 .small{font-size:.9rem}
+.note{font-size:.88rem;color:var(--muted)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tabs a{display:inline-block;padding:9px 12px;border-radius:999px;background:#292e3a;color:#fff;text-decoration:none;font-size:.9rem;font-weight:700}
+.pendulum{height:145px;position:relative;display:flex;justify-content:center;margin:16px 0 8px;overflow:hidden;border-radius:12px;background:#11141b;border:1px solid var(--line)}
+.pivot{position:absolute;top:13px;width:14px;height:14px;border-radius:50%;background:#fff;z-index:2}
+.needle{position:absolute;top:20px;width:5px;height:100px;background:#fff;border-radius:5px;transform-origin:50% 0;transform:rotate(0deg)}
+.weight{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;background:#fff}
+.caption{text-align:center;font-size:.85rem;color:var(--muted);margin:0 0 8px}
+.voice{border:1px solid var(--line);border-radius:12px;padding:10px;background:#151821;min-width:0}
+.voice-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.voice-title{font-weight:800}
+.mute{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);white-space:nowrap}
+.segment{border:1px solid var(--line);background:#151821;border-radius:12px;padding:12px;margin:10px 0}
+.segment-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.segment-top button{margin:0;padding:8px 10px}
+.voice-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+@media(max-width:560px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}.grid4,.voice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:13px}.big{font-size:clamp(2.2rem,12vw,3.5rem)}}
 </style>
 </head>
 <body>
-<h1>Metrónomo extremo</h1>
-<p>Experimental · 1–50,000 BPM · Safari y Chrome.</p>
+<header>
+  <div class="eyebrow">Laboratorio de ritmo · Versión ampliada</div>
+  <h1>Metrónomo Extremo 50K</h1>
+  <p>Compases, acentos, polirritmias de cuatro voces y diseño de estructuras rítmicas. Para mejores resultados, mantén esta página abierta mientras suena.</p>
+  <nav class="tabs"><a href="#metro">1 · Metrónomo</a><a href="#poly">2 · Polirritmias</a><a href="#builder">3 · Estructura</a></nav>
+</header>
 
-<section class="panel">
+<section class="panel" id="metro">
+  <h2>1. Metrónomo con compás y acentos</h2>
   <div class="big" id="readout">120 BPM</div>
   <label for="slider">Tempo</label>
   <input id="slider" type="range" min="1" max="50000" step="1" value="120">
-  <label for="number">BPM exactos</label>
-  <input id="number" type="number" min="1" max="50000" step="1" inputmode="numeric" value="120">
-  <p id="interval">Intervalo: 500 ms</p>
-  <button id="start">▶ Iniciar audio</button>
-  <button id="stop" class="secondary">■ Detener</button>
-  <div id="status" class="status" role="status">Pulsa Iniciar audio para habilitar el sonido.</div>
+  <div class="grid">
+    <div class="field"><label for="number">BPM exactos</label><input id="number" type="number" min="1" max="50000" step="1" inputmode="numeric" value="120"></div>
+    <div class="field"><label for="meterNum">Numerador</label><select id="meterNum"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>15</option><option>16</option></select></div>
+    <div class="field"><label for="meterDen">Denominador</label><select id="meterDen"><option>2</option><option>4</option><option selected>4</option><option>8</option><option>16</option></select></div>
+    <div class="field"><label for="accent">Acento de compás</label><select id="accent"><option value="strong" selected>Fuerte en tiempo 1</option><option value="two">Fuerte 1 · medio 3/4</option><option value="compound">Compuesto (ej. 6/8: 1 y 4)</option><option value="none">Sin acento especial</option></select></div>
+  </div>
+  <p id="interval">Intervalo de negra: 500 ms</p>
+  <p class="note">Convención: el BPM indica negras por minuto. El metrónomo pulsa la figura del denominador: por ejemplo, en 6/8 escuchas seis corcheas por compás. El primer tiempo suena más fuerte; en compases compuestos puedes acentuar también el inicio del segundo grupo.</p>
+  <button id="start">▶ Iniciar metrónomo</button><button id="stop" class="secondary">■ Detener</button>
+  <button id="recordMetro" class="secondary">● Grabar audio</button><button id="stopRecordMetro" class="danger" disabled>■ Terminar y guardar</button>
+  <div id="status" class="status" role="status">Pulsa Iniciar para habilitar el audio.</div>
+  <div id="recordStatus" class="status" role="status"></div>
+</section>
+
+<section class="panel" id="poly">
+  <h2>2. Polirritmias de cuatro voces</h2>
+  <p>Define cuántos ataques hace cada voz dentro de un ciclo. Puedes activar, silenciar o combinar voces para construir relaciones regulares e irregulares.</p>
+  <div class="pendulum" aria-label="Barra pendular que representa el ciclo polirrítmico"><div class="pivot"></div><div id="polyNeedle" class="needle"><div class="weight"></div></div></div>
+  <p id="pendulumCaption" class="caption">La barra se moverá al iniciar el polirritmo.</p>
+  <div class="grid">
+    <div class="field"><label for="cpm">Ciclos por minuto</label><input id="cpm" type="number" min="1" max="50000" value="120" inputmode="numeric"></div>
+    <div class="field"><label for="polyShape">Ciclo visual</label><select id="polyShape"><option value="swing" selected>Péndulo</option><option value="fast">Péndulo rápido</option></select></div>
+  </div>
+  <div class="grid4" style="margin-top:12px">
+    <div class="voice"><div class="voice-head"><span class="voice-title">Voz A</span><label class="mute"><input id="muteA" type="checkbox" checked> Activa</label></div><label for="a">Ataques/ciclo</label><input id="a" type="number" min="0" max="16" value="3" inputmode="numeric"><p class="note">0 = silencio</p></div>
+    <div class="voice"><div class="voice-head"><span class="voice-title">Voz B</span><label class="mute"><input id="muteB" type="checkbox" checked> Activa</label></div><label for="b">Ataques/ciclo</label><input id="b" type="number" min="0" max="16" value="2" inputmode="numeric"><p class="note">0 = silencio</p></div>
+    <div class="voice"><div class="voice-head"><span class="voice-title">Voz C</span><label class="mute"><input id="muteC" type="checkbox" checked> Activa</label></div><label for="c">Ataques/ciclo</label><input id="c" type="number" min="0" max="16" value="5" inputmode="numeric"><p class="note">0 = silencio</p></div>
+    <div class="voice"><div class="voice-head"><span class="voice-title">Voz D</span><label class="mute"><input id="muteD" type="checkbox" checked> Activa</label></div><label for="d">Ataques/ciclo</label><input id="d" type="number" min="0" max="16" value="4" inputmode="numeric"><p class="note">0 = silencio</p></div>
+  </div>
+  <button id="polyStart">▶ Iniciar polirritmia</button><button id="polyStop" class="secondary">■ Detener</button>
+  <button id="recordPoly" class="secondary">● Grabar audio</button><button id="stopRecordPoly" class="danger" disabled>■ Terminar y guardar</button>
+  <div id="polyStatus" class="status">Relación 3:2:5:4 · elige las voces que quieras escuchar.</div>
+  <div id="polyRecordStatus" class="status"></div>
+</section>
+
+<section class="panel" id="builder">
+  <h2>3. Diseñador de estructuras rítmicas</h2>
+  <p>Construye una secuencia de secciones. Cada fila puede cambiar tempo, compás, número de compases y figuras irregulares de cuatro voces. Las voces se distribuyen a lo largo de cada compás completo.</p>
+  <div id="segments"></div>
+  <button id="addSegment">＋ Añadir sección</button>
+  <button id="playStructure">▶ Reproducir estructura</button>
+  <button id="stopStructure" class="secondary">■ Detener estructura</button>
+  <button id="recordStructure" class="secondary">● Grabar estructura</button><button id="stopRecordStructure" class="danger" disabled>■ Terminar y guardar</button>
+  <div id="builderStatus" class="status">La estructura inicial tiene dos secciones de ejemplo. Puedes editarlas o eliminarlas.</div>
+  <div id="builderRecordStatus" class="status"></div>
 </section>
 
 <section class="panel">
-  <h2>Dos capas polirrítmicas</h2>
-  <p class="small">Combina dos subdivisiones para experimentar con polirritmos.</p>
-  <div class="grid">
-    <div>
-      <label for="a">Capa A (ataques/ciclo)</label>
-      <input id="a" type="number" min="1" max="16" value="3" inputmode="numeric">
-    </div>
-    <div>
-      <label for="b">Capa B (ataques/ciclo)</label>
-      <input id="b" type="number" min="1" max="16" value="2" inputmode="numeric">
-    </div>
-  </div>
-  <label for="cpm">Ciclos por minuto</label>
-  <input id="cpm" type="number" min="1" max="50000" value="120" inputmode="numeric">
-  <button id="poly">▶ Iniciar polirritmo</button>
-  <button id="polyStop" class="secondary">■ Detener</button>
-  <div id="polyStatus" class="status">Relación 3:2</div>
-</section>
-
-<section class="panel small">
-  <strong>Qué esperar</strong>
-  <p>Por debajo de 1,500 BPM se programan clics. A partir de 1,500 BPM se utiliza un tono continuo equivalente a la frecuencia del pulso, porque los clics individuales dejan de ser prácticos a velocidades extremas.</p>
-  <p>A 50,000 BPM, el intervalo matemático es de 1.2 milisegundos. El resultado audible depende del equipo y de la percepción.</p>
-  <p>Si no suena, sube el volumen y vuelve a pulsar Iniciar audio. Mantén esta pestaña visible durante la reproducción.</p>
+  <h2>Notas sobre audio y grabación</h2>
+  <p>Las grabaciones capturan el audio generado por esta página y se guardan como archivo de audio cuando el navegador lo permite. En iPhone, Safari puede mostrar una vista previa o el menú para compartir; desde ahí puedes guardar el archivo en Archivos.</p>
+  <p>En tempos muy altos, los clics se convierten en tonos continuos equivalentes para evitar programar miles de ataques por segundo. La frecuencia audible y la precisión final dependen del navegador, del sistema de audio y del dispositivo. Mantén esta página en primer plano durante la reproducción.</p>
 </section>
 
 <script>
 (()=>{
 'use strict';
-
 const $=id=>document.getElementById(id);
-let ac=null,master=null,mainTimer=null,mainOsc=null,mainGain=null;
-let active=false,next=0,polyTimer=null,polyActive=false,polyOscs=[];
 const MAX=50000,AHEAD=.12,LOOK=25;
+let ac=null,master=null,recordDest=null;
+let metroActive=false,metroTimer=null,metroNext=0,metroOsc=null,metroGain=null,metroBeat=0;
+let polyActive=false,polyTimer=null,polyNext=[],polyOscs=[],swingFrame=null,swingStart=0,swingRate=120;
+let structureActive=false,structureTimer=null,structureOscs=[],structureStartedAt=0;
+let recorders={metro:null,poly:null,structure:null},recordChunks={metro:[],poly:[],structure:[]};
 
-function bpm(v){
-  let n=Number(v);
-  if(!Number.isFinite(n))n=120;
-  return Math.max(1,Math.min(MAX,Math.round(n)));
+function clampInt(v,min,max,def){const n=Number(v);return Number.isFinite(n)?Math.max(min,Math.min(max,Math.round(n))):def}
+function bpm(v){return clampInt(v,1,MAX,120)}
+function meter(){return {num:clampInt($('meterNum').value,1,16,4),den:clampInt($('meterDen').value,2,16,4)}}
+function beatSeconds(tempo,den){return 60/tempo*4/den}
+function barSeconds(tempo,num,den){return beatSeconds(tempo,den)*num}
+function voiceCount(id){return clampInt($(id).value,0,16,0)}
+function setStatus(id,msg){$(id).textContent=msg}
+function syncTempo(v){
+ const n=bpm(v);$('slider').value=n;$('number').value=n;$('readout').textContent=n.toLocaleString('en-US')+' BPM';
+ const m=meter();setStatus('interval','Intervalo de negra: '+(60000/n).toFixed(n>=1000?4:2)+' ms · Compás '+m.num+'/'+m.den);
 }
+$('slider').addEventListener('input',e=>syncTempo(e.target.value));
+$('number').addEventListener('change',e=>syncTempo(e.target.value));
+$('meterNum').addEventListener('change',()=>syncTempo($('number').value));
+$('meterDen').addEventListener('change',()=>syncTempo($('number').value));
 
-function sync(v){
-  const n=bpm(v);
-  $('slider').value=n;
-  $('number').value=n;
-  $('readout').textContent=n.toLocaleString('en-US')+' BPM';
-  $('interval').textContent='Intervalo matemático: '+(60000/n).toFixed(n>=1000?4:2)+' ms';
+async function initAudio(){
+ if(!ac){
+  const C=window.AudioContext||window.webkitAudioContext;
+  if(!C)throw Error('Este navegador no admite Web Audio API.');
+  ac=new C();master=ac.createGain();master.gain.value=.25;
+  recordDest=ac.createMediaStreamDestination();
+  master.connect(ac.destination);master.connect(recordDest);
+ }
+ if(ac.state!=='running')await ac.resume();
 }
-
-$('slider').addEventListener('input',e=>sync(e.target.value));
-$('number').addEventListener('change',e=>sync(e.target.value));
-
-async function init(){
-  if(!ac){
-    const C=window.AudioContext||window.webkitAudioContext;
-    if(!C)throw Error('Este navegador no admite Web Audio API.');
-    ac=new C();
-    master=ac.createGain();
-    master.gain.value=.22;
-    master.connect(ac.destination);
-  }
-  if(ac.state!=='running')await ac.resume();
+function clickAt(t,f=1000,d=.012,v=.6){
+ const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(f,t);
+ g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.001);
+ g.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.004,d));
+ o.connect(g);g.connect(master);o.start(t);o.stop(t+Math.max(.006,d+.004));
 }
-
-function click(t,f=1000,d=.01,v=.6){
-  const o=ac.createOscillator(),g=ac.createGain();
-  o.type='sine';
-  o.frequency.setValueAtTime(f,t);
-  g.gain.setValueAtTime(.0001,t);
-  g.gain.linearRampToValueAtTime(v,t+.001);
-  g.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.003,d));
-  o.connect(g);
-  g.connect(master);
-  o.start(t);
-  o.stop(t+Math.max(.005,d+.003));
+function sustained(freq,gain=.08){
+ const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=Math.max(20,Math.min(18000,freq));g.gain.value=gain;o.connect(g);g.connect(master);o.start();return {o,g};
 }
-
-function stopMain(){
-  if(mainTimer!==null)clearTimeout(mainTimer);
-  mainTimer=null;
-  if(mainOsc){
-    try{mainOsc.stop()}catch(e){}
-    try{mainOsc.disconnect();mainGain.disconnect()}catch(e){}
-    mainOsc=null;
-    mainGain=null;
-  }
+function stopOscList(list){list.forEach(x=>{const o=x.o||x;try{o.stop()}catch(e){}try{o.disconnect();if(x.g)x.g.disconnect()}catch(e){}});list.length=0}
+function stopMetroAudio(){
+ if(metroTimer!==null)clearTimeout(metroTimer);metroTimer=null;
+ if(metroOsc){try{metroOsc.o.stop()}catch(e){}try{metroOsc.o.disconnect();metroOsc.g.disconnect()}catch(e){}metroOsc=null}
+ metroGain=null;
 }
-
-function schedule(){
-  if(!active||!ac)return;
-  const n=bpm($('number').value);
-
-  if(n>=1500){
-    stopMain();
-    mainOsc=ac.createOscillator();
-    mainGain=ac.createGain();
-    mainOsc.type='sine';
-    mainOsc.frequency.value=n/60;
-    mainGain.gain.value=.12;
-    mainOsc.connect(mainGain);
-    mainGain.connect(master);
-    mainOsc.start();
-    $('status').textContent='Tono continuo equivalente: '+(n/60).toFixed(2)+' Hz; no son clics separados.';
-    return;
-  }
-
-  const step=60/n;
-  while(next<ac.currentTime+AHEAD){
-    click(next,1100,.012,.65);
-    next+=step;
-  }
-  mainTimer=setTimeout(schedule,LOOK);
+function accentLevel(beat,num,den){
+ const mode=$('accent').value;
+ if(beat===0){return mode==='none'?.58:.95}
+ if(mode==='two' && (num===3||num===4||num===6||num===8) && beat===Math.floor(num/2))return .7;
+ if(mode==='compound' && num%3===0 && num>=6 && beat===num/2)return .72;
+ return .38;
 }
-
+function scheduleMetro(){
+ if(!metroActive||!ac)return;
+ const tempo=bpm($('number').value),m=meter(),step=beatSeconds(tempo,m.den);
+ if(tempo>=1500){
+  if(!metroOsc){metroOsc=sustained(tempo/60,.09);setStatus('status','Tono continuo equivalente a '+(tempo/60).toFixed(2)+' Hz. A este tempo los pulsos no se distinguen como clics.')}
+  return;
+ }
+ while(metroNext<ac.currentTime+AHEAD){
+  const beat=metroBeat%m.num,level=accentLevel(beat,m.num,m.den);
+  const freq=beat===0?1500:(level>.6?1150:850);
+  clickAt(metroNext,freq,.014,level);
+  metroNext+=step;metroBeat++;
+ }
+ metroTimer=setTimeout(scheduleMetro,LOOK);
+}
 $('start').addEventListener('click',async()=>{
-  try{
-    await init();
-    active=true;
-    stopMain();
-    next=ac.currentTime+.04;
-    $('status').textContent='Audio activo.';
-    schedule();
-  }catch(e){
-    $('status').textContent='Error de audio: '+e.message;
-  }
+ try{await initAudio();stopMetroAudio();metroActive=true;metroBeat=0;metroNext=ac.currentTime+.04;setStatus('status','Metrónomo activo · '+meter().num+'/'+meter().den);scheduleMetro()}
+ catch(e){setStatus('status','Error de audio: '+e.message)}
 });
+$('stop').addEventListener('click',()=>{metroActive=false;stopMetroAudio();setStatus('status','Metrónomo detenido.')});
 
-$('stop').addEventListener('click',()=>{
-  active=false;
-  stopMain();
-  $('status').textContent='Metrónomo detenido.';
-});
-
-function stopPoly(){
-  if(polyTimer!==null)clearTimeout(polyTimer);
-  polyTimer=null;
-  polyOscs.forEach(o=>{try{o.stop()}catch(e){}});
-  polyOscs=[];
+function currentPolyVoices(){
+ return [
+  {id:'a',mute:'muteA',freq:700,level:.42,name:'A'},
+  {id:'b',mute:'muteB',freq:1000,level:.36,name:'B'},
+  {id:'c',mute:'muteC',freq:1350,level:.31,name:'C'},
+  {id:'d',mute:'muteD',freq:1700,level:.28,name:'D'}
+ ].map(v=>({...v,count:$(v.id).checked?voiceCount(v.id):0}));
 }
+function stopPolyAudio(){
+ if(polyTimer!==null)clearTimeout(polyTimer);polyTimer=null;
+ stopOscList(polyOscs);polyNext=[];
+}
+function stopSwing(){
+ if(swingFrame!==null)cancelAnimationFrame(swingFrame);swingFrame=null;
+ const n=$('polyNeedle');if(n)n.style.transform='rotate(0deg)';
+}
+function animateSwing(){
+ if(!polyActive){stopSwing();return}
+ const elapsed=(performance.now()-swingStart)/1000;
+ const hz=Math.min($('polyShape').value==='fast'?8:4,Math.max(.1,swingRate/60));
+ $('polyNeedle').style.transform='rotate('+(Math.sin(elapsed*2*Math.PI*hz)*34)+'deg)';
+ swingFrame=requestAnimationFrame(animateSwing);
+}
+function startPolyScheduler(){
+ const cpm=bpm($('cpm').value),voices=currentPolyVoices(),cycle=60/cpm;
+ polyNext=voices.map(()=>ac.currentTime+.05);
+ swingRate=cpm;swingStart=performance.now();swingFrame=requestAnimationFrame(animateSwing);
+ $('pendulumCaption').textContent='Barra visual del ciclo · '+cpm+' ciclos/min.';
+ const continuous=[];
+ voices.forEach((v,i)=>{
+  const rate=cpm*v.count/60;
+  if(v.count>0&&rate>=25){const tone=sustained(rate,v.level*.45);polyOscs.push(tone);continuous.push(v.name+' '+rate.toFixed(1)+' Hz')}
+ });
+ if(continuous.length)setStatus('polyStatus','Voces continuas por velocidad: '+continuous.join(' · '));
+ else setStatus('polyStatus','Relación activa: '+voices.map(v=>v.count||'—').join(':')+' · '+cpm+' ciclos/min.');
+ function tick(){
+  if(!polyActive)return;
+  const now=ac.currentTime;
+  voices.forEach((v,i)=>{
+   if(v.count===0||cpm*v.count/60>=25)return;
+   const interval=cycle/v.count;
+   while(polyNext[i]<now+AHEAD){
+    const pos=Math.round((polyNext[i]-(ac.currentTime-.05))/interval);
+    clickAt(polyNext[i],v.freq,.009,v.level);
+    polyNext[i]+=interval;
+   }
+  });
+  polyTimer=setTimeout(tick,LOOK);
+ }
+ tick();
+}
+$('polyStart').addEventListener('click',async()=>{
+ try{
+  await initAudio();stopPolyAudio();stopSwing();polyActive=true;
+  startPolyScheduler();
+ }catch(e){setStatus('polyStatus','Error de audio: '+e.message)}
+});
+$('polyStop').addEventListener('click',()=>{polyActive=false;stopPolyAudio();stopSwing();setStatus('polyStatus','Polirritmia detenida.');setStatus('pendulumCaption','Barra detenida.')});
 
-$('poly').addEventListener('click',async()=>{
-  try{
-    await init();
-    stopPoly();
-    polyActive=true;
-
-    const a=Math.max(1,Math.min(16,Number($('a').value)||3));
-    const b=Math.max(1,Math.min(16,Number($('b').value)||2));
-    const c=bpm($('cpm').value);
-
-    $('polyStatus').textContent='Relación '+a+':'+b+' · '+c+' ciclos/min.';
-
-    if(c>=1500){
-      [[c*a/60,.09],[c*b/60,.065]].forEach(([f,v])=>{
-        const o=ac.createOscillator(),g=ac.createGain();
-        o.type='sine';
-        o.frequency.value=Math.min(18000,f);
-        g.gain.value=v;
-        o.connect(g);
-        g.connect(master);
-        o.start();
-        polyOscs.push(o);
-      });
-      $('polyStatus').textContent='Textura equivalente: '+(c*a/60).toFixed(2)+' Hz y '+(c*b/60).toFixed(2)+' Hz; no son golpes separados.';
-      return;
+function stopStructureAudio(){
+ if(structureTimer!==null)clearTimeout(structureTimer);structureTimer=null;
+ stopOscList(structureOscs);
+}
+function scheduleToneAt(freq,gain,start,end){
+ const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=Math.max(20,Math.min(18000,freq));
+ g.gain.setValueAtTime(.0001,start);g.gain.setValueAtTime(gain,Math.max(start+.001,end-.01));g.gain.exponentialRampToValueAtTime(.0001,Math.max(start+.005,end));
+ o.connect(g);g.connect(master);o.start(start);o.stop(Math.max(start+.01,end));structureOscs.push({o,g});
+}
+function playStructure(){
+ const segments=readSegments(),events=[];let cursor=ac.currentTime+.08;
+ const voiceFreq=[700,1000,1350,1700],voiceLevel=[.35,.31,.27,.24];
+ segments.forEach((s,si)=>{
+  const beat=beatSeconds(s.tempo,s.den),bar=beat*s.num,sectionDuration=bar*s.bars,sectionStart=cursor,sectionEnd=sectionStart+sectionDuration;
+  if(s.tempo>=1500){events.push({type:'tone',t:sectionStart,end:sectionEnd,freq:s.tempo/60,gain:.07,label:`Sección ${si+1}: tono de tempo`});}
+  else{
+   for(let barIndex=0;barIndex<s.bars;barIndex++){
+    const barStart=sectionStart+barIndex*bar;
+    for(let bi=0;bi<s.num;bi++){
+     const compound=(s.num>=6&&s.num%3===0&&bi===s.num/2);
+     const amp=bi===0?.88:(compound?.56:.32);
+     events.push({type:'click',t:barStart+bi*beat,freq:bi===0?1500:(compound?1150:850),gain:amp,duration:.012});
     }
-
-    let start=ac.currentTime+.05,count=0;
-
-    function tick(){
-      if(!polyActive)return;
-      const dur=60/c,now=ac.currentTime;
-
-      while(start<now+AHEAD){
-        for(let i=0;i<a;i++)click(start+i*dur/a,850,.006,.42);
-        for(let i=0;i<b;i++)click(start+i*dur/b,1450,.006,.35);
-        start+=dur;
-
-        if(++count>=100){
-          polyActive=false;
-          $('polyStatus').textContent='Se detuvo tras 100 ciclos para mantener estable el navegador.';
-          return;
-        }
-      }
-      polyTimer=setTimeout(tick,LOOK);
-    }
-    tick();
-  }catch(e){
-    $('polyStatus').textContent='Error de audio: '+e.message;
+    [s.a,s.b,s.c,s.d].forEach((count,i)=>{
+     if(!count)return;
+     const rate=count/bar;
+     if(rate>=25){
+      // A single sustained tone stands in for attacks too fast to distinguish as clicks.
+      events.push({type:'tone',t:barStart,end:barStart+bar,freq:rate,gain:voiceLevel[i]*.48,label:`Voz ${'ABCD'[i]}`});
+     }else{
+      for(let k=0;k<count;k++)events.push({type:'click',t:barStart+k*bar/count,freq:voiceFreq[i],gain:voiceLevel[i],duration:.009});
+     }
+    });
+   }
   }
+  cursor=sectionEnd;
+ });
+ events.sort((a,b)=>a.t-b.t);
+ let eventIndex=0;structureActive=true;
+ setStatus('builderStatus',`Estructura en reproducción · ${segments.length} secciones · duración aproximada ${(cursor-(ac.currentTime+.08)).toFixed(1)} s`);
+ function tick(){
+  if(!structureActive)return;
+  const horizon=ac.currentTime+AHEAD;
+  while(eventIndex<events.length&&events[eventIndex].t<horizon){
+   const e=events[eventIndex++];
+   if(e.type==='click')clickAt(e.t,e.freq,e.duration,e.gain);
+   else if(e.type==='tone')scheduleToneAt(e.freq,e.gain,e.t,e.end);
+  }
+  if(eventIndex>=events.length){
+   structureActive=false;setStatus('builderStatus','Estructura terminada.');return;
+  }
+  structureTimer=setTimeout(tick,LOOK);
+ }
+ tick();
+}
+$('addSegment').addEventListener('click',()=>addSegment());
+$('playStructure').addEventListener('click',async()=>{
+ try{await initAudio();stopStructureAudio();structureActive=false;structureStartedAt=ac.currentTime;playStructure()}
+ catch(e){setStatus('builderStatus','Error de audio: '+e.message)}
 });
+$('stopStructure').addEventListener('click',()=>{structureActive=false;stopStructureAudio();setStatus('builderStatus','Estructura detenida.')});
 
-$('polyStop').addEventListener('click',()=>{
-  polyActive=false;
-  stopPoly();
-  $('polyStatus').textContent='Polirritmo detenido.';
-});
+function mediaRecorderType(){
+ if(!window.MediaRecorder)return '';
+ const types=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'];
+ return types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
+}
+function startRecording(key,statusId,buttonId,stopButtonId){
+ if(!window.MediaRecorder){setStatus(statusId,'Este navegador no admite grabación de audio. Prueba con una versión reciente de Safari.');return}
+ if(recorders[key])return;
+ try{
+  const type=mediaRecorderType();
+  const stream=recordDest.stream;
+  const recorder=type?new MediaRecorder(stream,{mimeType:type}):new MediaRecorder(stream);
+  recordChunks[key]=[];
+  recorder.ondataavailable=e=>{if(e.data&&e.data.size)recordChunks[key].push(e.data)};
+  recorder.onerror=e=>setStatus(statusId,'Error de grabación: '+(e.error?.message||'desconocido'));
+  recorder.onstop=()=>{
+   const mime=recorder.mimeType||type||'audio/webm';
+   const blob=new Blob(recordChunks[key],{type:mime});
+   if(!blob.size){setStatus(statusId,'No se generó audio. Inicia el sonido y vuelve a grabar.');return}
+   const ext=mime.includes('mp4')?'m4a':mime.includes('ogg')?'ogg':'webm';
+   const url=URL.createObjectURL(blob),a=document.createElement('a');
+   a.href=url;a.download=`metronomo-extremo-${key}-${new Date().toISOString().replace(/[:.]/g,'-')}.${ext}`;
+   a.textContent='Guardar archivo de audio';a.style.display='inline-block';a.style.color='#8cc8ff';a.style.marginTop='10px';
+   const box=$(statusId);box.textContent='Grabación lista. Si la descarga no comienza, toca este enlace: ';box.appendChild(a);
+   $(buttonId).disabled=false;$(stopButtonId).disabled=true;recorders[key]=null;
+  };
+  recorder.start(250);recorders[key]=recorder;
+  $(buttonId).disabled=true;$(stopButtonId).disabled=false;
+  setStatus(statusId,'Grabando audio… pulsa “Terminar y guardar” cuando acabes.');
+ }catch(e){setStatus(statusId,'No se pudo iniciar la grabación: '+e.message)}
+}
+function stopRecording(key){if(recorders[key]&&recorders[key].state!=='inactive')recorders[key].stop()}
+$('recordMetro').addEventListener('click',async()=>{try{await initAudio();startRecording('metro','recordStatus','recordMetro','stopRecordMetro')}catch(e){setStatus('recordStatus','Error: '+e.message)}});
+$('stopRecordMetro').addEventListener('click',()=>stopRecording('metro'));
+$('recordPoly').addEventListener('click',async()=>{try{await initAudio();startRecording('poly','polyRecordStatus','recordPoly','stopRecordPoly')}catch(e){setStatus('polyRecordStatus','Error: '+e.message)}});
+$('stopRecordPoly').addEventListener('click',()=>stopRecording('poly'));
+$('recordStructure').addEventListener('click',async()=>{try{await initAudio();startRecording('structure','builderRecordStatus','recordStructure','stopRecordStructure')}catch(e){setStatus('builderRecordStatus','Error: '+e.message)}});
+$('stopRecordStructure').addEventListener('click',()=>stopRecording('structure'));
 
 document.addEventListener('visibilitychange',()=>{
-  if(document.hidden&&active){
-    active=false;
-    stopMain();
-    $('status').textContent='Audio pausado al salir de esta pestaña. Pulsa Iniciar para reanudar.';
-  }
+ if(document.hidden){
+  if(metroActive){metroActive=false;stopMetroAudio();setStatus('status','Metrónomo detenido al salir de la pestaña.')}
+  if(polyActive){polyActive=false;stopPolyAudio();stopSwing();setStatus('polyStatus','Polirritmia detenida al salir de la pestaña.')}
+  if(structureActive){structureActive=false;stopStructureAudio();setStatus('builderStatus','Estructura detenida al salir de la pestaña.')}
+ }
 });
-
-sync(120);
+$('accent').addEventListener('change',()=>syncTempo($('number').value));
+addSegment({bars:2,tempo:120,num:4,den:4,a:3,b:2,c:0,d:0});
+addSegment({bars:2,tempo:90,num:6,den:8,a:5,b:4,c:3,d:0});
+syncTempo(120);
 })();
 </script>
 </body>
