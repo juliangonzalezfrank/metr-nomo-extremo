@@ -105,14 +105,37 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 
 <section class="panel" id="builder">
   <h2>3. Diseñador de estructuras rítmicas</h2>
-  <p>Construye una secuencia de secciones. Cada fila puede cambiar tempo, compás, número de compases y figuras irregulares de cuatro voces. Las voces se distribuyen a lo largo de cada compás completo.</p>
-  <div id="segments"></div>
-  <button id="addSegment">＋ Añadir sección</button>
-  <button id="playStructure">▶ Reproducir estructura</button>
-  <button id="stopStructure" class="secondary">■ Detener estructura</button>
-  <button id="recordStructure" class="secondary">● Grabar estructura</button><button id="stopRecordStructure" class="danger" disabled>■ Terminar y guardar</button>
-  <div id="builderStatus" class="status">La estructura inicial tiene dos secciones de ejemplo. Puedes editarlas o eliminarlas.</div>
-  <div id="builderRecordStatus" class="status"></div>
+  <p>Diseña cada sección por separado. Define tempo, compás y duración; después puedes añadir una o dos voces polirrítmicas que harán esa cantidad de ataques en cada compás. Al terminar, integra las secciones para reproducirlas en orden o descargar toda la estructura como audio WAV.</p>
+  <div class="segment" id="sectionEditor">
+    <h3>Nueva sección</h3>
+    <div class="grid4">
+      <div class="field"><label for="secTempo">Tempo (BPM)</label><input id="secTempo" type="number" min="1" max="50000" value="120" inputmode="numeric"></div>
+      <div class="field"><label for="secNum">Numerador</label><select id="secNum"><option >2</option><option >3</option><option selected>4</option><option >5</option><option >6</option><option >7</option><option >8</option><option >9</option><option >10</option><option >11</option><option >12</option><option >13</option><option >15</option><option >16</option></select></div>
+      <div class="field"><label for="secDen">Denominador</label><select id="secDen"><option >2</option><option selected>4</option><option >8</option><option >16</option></select></div>
+      <div class="field"><label for="secBars">Número de compases</label><input id="secBars" type="number" min="1" max="128" value="4" inputmode="numeric"></div>
+    </div>
+    <button type="button" id="togglePoly" class="secondary">＋ Agregar polirritmias</button>
+    <div id="sectionPolyEditor" hidden>
+      <p class="note">Añade una o dos voces por compás. El número indica cuántos ataques distribuidos uniformemente tendrá cada voz dentro de cada compás.</p>
+      <div class="grid">
+        <div class="field"><label for="polyVoiceCount">Número de voces</label><select id="polyVoiceCount"><option value="1" selected>1 voz</option><option value="2">2 voces</option></select></div>
+        <div class="field"><label for="polyVoice1">Voz 1 · ataques por compás</label><input id="polyVoice1" type="number" min="1" max="32" value="3" inputmode="numeric"></div>
+        <div class="field" id="polyVoice2Wrap" hidden><label for="polyVoice2">Voz 2 · ataques por compás</label><input id="polyVoice2" type="number" min="1" max="32" value="2" inputmode="numeric"></div>
+      </div>
+    </div>
+    <button type="button" id="saveSection">＋ Guardar sección</button>
+  </div>
+  <h3>Secciones guardadas</h3>
+  <div id="segments"><p class="note" id="emptySections">Todavía no has agregado secciones.</p></div>
+  <hr>
+  <button id="integrateSections">⤴ Integrar secciones</button>
+  <div id="integratedControls" hidden>
+    <p id="integratedSummary" class="note"></p>
+    <button id="playStructure">▶ Reproducir estructura integrada</button>
+    <button id="stopStructure" class="secondary">■ Detener</button>
+    <button id="downloadStructure" class="secondary">↓ Descargar audio WAV</button>
+  </div>
+  <div id="builderStatus" class="status">Configura tu primera sección y pulsa «Guardar sección».</div>
 </section>
 
 <section class="panel">
@@ -265,63 +288,125 @@ function stopStructureAudio(){
  if(structureTimer!==null)clearTimeout(structureTimer);structureTimer=null;
  stopOscList(structureOscs);
 }
-function scheduleToneAt(freq,gain,start,end){
- const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=Math.max(20,Math.min(18000,freq));
- g.gain.setValueAtTime(.0001,start);g.gain.setValueAtTime(gain,Math.max(start+.001,end-.01));g.gain.exponentialRampToValueAtTime(.0001,Math.max(start+.005,end));
- o.connect(g);g.connect(master);o.start(start);o.stop(Math.max(start+.01,end));structureOscs.push({o,g});
+let integratedSegments=[],structureEvents=[],integratedDuration=0;
+const structureFreq=[1100,1550],structureLevel=[.34,.28];
+function renumberSections(){
+ [...$('segments').querySelectorAll('.saved-section')].forEach((el,i)=>{el.querySelector('h3').textContent='Sección '+(i+1)});
+ const empty=$('emptySections');if(empty)empty.hidden=$('segments').querySelectorAll('.saved-section').length>0;
 }
-function playStructure(){
- const segments=readSegments(),events=[];let cursor=ac.currentTime+.08;
- const voiceFreq=[700,1000,1350,1700],voiceLevel=[.35,.31,.27,.24];
+function invalidateIntegration(){
+ integratedSegments=[];structureEvents=[];$('integratedControls').hidden=true;
+ setStatus('builderStatus','Cambios pendientes: vuelve a pulsar «Integrar secciones» para actualizar la estructura.');
+}
+function addSavedSection(){
+ const voices=[];
+ if(!$('sectionPolyEditor').hidden){
+  voices.push(clampInt($('polyVoice1').value,1,32,3));
+  if($('polyVoiceCount').value==='2')voices.push(clampInt($('polyVoice2').value,1,32,2));
+ }
+ const item={tempo:bpm($('secTempo').value),num:clampInt($('secNum').value,1,16,4),den:clampInt($('secDen').value,2,16,4),bars:clampInt($('secBars').value,1,128,4),voices};
+ const card=document.createElement('div');card.className='segment saved-section';
+ const voiceText=voices.length?voices.map((v,i)=>`Voz ${i+1}: ${v} ataque${v===1?'':'s'}/compás`).join(' · '):'Sin voces polirrítmicas';
+ card.innerHTML=`<div class="segment-top"><h3>Sección</h3><button type="button" class="danger remove-section">Eliminar</button></div><p><strong>${item.tempo.toLocaleString('en-US')} BPM</strong> · Compás <strong>${item.num}/${item.den}</strong> · <strong>${item.bars}</strong> compás(es)</p><p class="note">${voiceText}</p>`;
+ card._sectionData=item;
+ card.querySelector('.remove-section').addEventListener('click',()=>{card.remove();renumberSections();invalidateIntegration()});
+ $('segments').appendChild(card);renumberSections();invalidateIntegration();
+ setStatus('builderStatus','Sección agregada. Puedes crear la siguiente con otro tempo, compás o polirritmia.');
+}
+function getSavedSections(){return [...$('segments').querySelectorAll('.saved-section')].map(el=>({...el._sectionData,voices:[...el._sectionData.voices]}))}
+function buildStructureEvents(segments){
+ const events=[];let cursor=0;
  segments.forEach((s,si)=>{
-  const beat=beatSeconds(s.tempo,s.den),bar=beat*s.num,sectionDuration=bar*s.bars,sectionStart=cursor,sectionEnd=sectionStart+sectionDuration;
-  if(s.tempo>=1500){events.push({type:'tone',t:sectionStart,end:sectionEnd,freq:s.tempo/60,gain:.07,label:`Sección ${si+1}: tono de tempo`});}
+  const beat=beatSeconds(s.tempo,s.den),bar=beat*s.num,sectionStart=cursor,sectionEnd=sectionStart+bar*s.bars;
+  if(s.tempo>=1500){events.push({type:'tone',t:sectionStart,end:sectionEnd,freq:s.tempo/60,gain:.07,label:`Sección ${si+1}: tempo`})}
   else{
-   for(let barIndex=0;barIndex<s.bars;barIndex++){
-    const barStart=sectionStart+barIndex*bar;
-    for(let bi=0;bi<s.num;bi++){
-     const compound=(s.num>=6&&s.num%3===0&&bi===s.num/2);
-     const amp=bi===0?.88:(compound?.56:.32);
-     events.push({type:'click',t:barStart+bi*beat,freq:bi===0?1500:(compound?1150:850),gain:amp,duration:.012});
+   for(let bi=0;bi<s.bars;bi++){
+    const barStart=sectionStart+bi*bar;
+    for(let beatIndex=0;beatIndex<s.num;beatIndex++){
+     const compound=s.num>=6&&s.num%3===0&&beatIndex===s.num/2;
+     events.push({type:'click',t:barStart+beatIndex*beat,freq:beatIndex===0?1500:(compound?1150:850),gain:beatIndex===0?.88:(compound?.56:.32),duration:.012});
     }
-    [s.a,s.b,s.c,s.d].forEach((count,i)=>{
-     if(!count)return;
+    s.voices.forEach((count,i)=>{
      const rate=count/bar;
-     if(rate>=25){
-      // A single sustained tone stands in for attacks too fast to distinguish as clicks.
-      events.push({type:'tone',t:barStart,end:barStart+bar,freq:rate,gain:voiceLevel[i]*.48,label:`Voz ${'ABCD'[i]}`});
-     }else{
-      for(let k=0;k<count;k++)events.push({type:'click',t:barStart+k*bar/count,freq:voiceFreq[i],gain:voiceLevel[i],duration:.009});
-     }
+     if(rate>=25)events.push({type:'tone',t:barStart,end:barStart+bar,freq:rate,gain:structureLevel[i]||.25,label:`Voz ${i+1}`});
+     else for(let k=0;k<count;k++)events.push({type:'click',t:barStart+k*bar/count,freq:structureFreq[i]||1600,gain:structureLevel[i]||.25,duration:.009});
     });
    }
   }
   cursor=sectionEnd;
  });
- events.sort((a,b)=>a.t-b.t);
- let eventIndex=0;structureActive=true;
- setStatus('builderStatus',`Estructura en reproducción · ${segments.length} secciones · duración aproximada ${(cursor-(ac.currentTime+.08)).toFixed(1)} s`);
+ events.sort((a,b)=>a.t-b.t);return {events,duration:cursor};
+}
+function integrateSections(){
+ const list=getSavedSections();
+ if(!list.length){setStatus('builderStatus','Agrega al menos una sección antes de integrarlas.');return}
+ integratedSegments=list;const result=buildStructureEvents(list);structureEvents=result.events;integratedDuration=result.duration;
+ $('integratedControls').hidden=false;
+ $('integratedSummary').textContent=`Estructura integrada: ${list.length} sección(es) · duración aproximada ${integratedDuration.toFixed(1)} s · ${structureEvents.length.toLocaleString('es-MX')} eventos de audio.`;
+ setStatus('builderStatus','¡Secciones integradas! Ya puedes escuchar la estructura completa o descargarla como archivo WAV.');
+}
+function playStructure(){
+ if(!integratedSegments.length){setStatus('builderStatus','Primero pulsa «Integrar secciones».');return}
+ stopStructureAudio();let eventIndex=0;const origin=ac.currentTime+.08;
+ structureActive=true;
+ setStatus('builderStatus',`Reproduciendo estructura integrada · ${integratedSegments.length} secciones.`);
  function tick(){
   if(!structureActive)return;
   const horizon=ac.currentTime+AHEAD;
-  while(eventIndex<events.length&&events[eventIndex].t<horizon){
-   const e=events[eventIndex++];
-   if(e.type==='click')clickAt(e.t,e.freq,e.duration,e.gain);
-   else if(e.type==='tone')scheduleToneAt(e.freq,e.gain,e.t,e.end);
+  while(eventIndex<structureEvents.length&&origin+structureEvents[eventIndex].t<horizon){
+   const e=structureEvents[eventIndex++],t=origin+e.t;
+   if(e.type==='click')clickAt(t,e.freq,e.duration,e.gain);
+   else if(e.type==='tone')scheduleToneAt(e.freq,e.gain,t,origin+e.end);
   }
-  if(eventIndex>=events.length){
-   structureActive=false;setStatus('builderStatus','Estructura terminada.');return;
-  }
+  if(eventIndex>=structureEvents.length){structureActive=false;setStatus('builderStatus','Estructura integrada terminada.');return}
   structureTimer=setTimeout(tick,LOOK);
  }
  tick();
 }
-$('addSegment').addEventListener('click',()=>addSegment());
-$('playStructure').addEventListener('click',async()=>{
- try{await initAudio();stopStructureAudio();structureActive=false;structureStartedAt=ac.currentTime;playStructure()}
- catch(e){setStatus('builderStatus','Error de audio: '+e.message)}
+async function downloadIntegratedWav(){
+ if(!integratedSegments.length){setStatus('builderStatus','Primero integra las secciones.');return}
+ if(integratedDuration>180){setStatus('builderStatus','La exportación WAV está limitada a 3 minutos por archivo para cuidar la memoria del iPhone. Reduce los compases o divide la estructura en archivos más cortos.');return}
+ const btn=$('downloadStructure');btn.disabled=true;setStatus('builderStatus','Renderizando audio WAV… no cierres esta página.');
+ try{
+  const sampleRate=44100,frames=Math.ceil((integratedDuration+.15)*sampleRate);
+  const Offline=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+  if(!Offline)throw Error('Este navegador no admite renderizado de audio offline.');
+  const off=new Offline(1,frames,sampleRate),out=off.createGain();out.gain.value=.25;out.connect(off.destination);
+  structureEvents.forEach(e=>{
+   if(e.type==='click'){
+    const o=off.createOscillator(),g=off.createGain();o.type='sine';o.frequency.value=e.freq;
+    const t=Math.max(0,e.t),dur=e.duration||.012;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(Math.min(.95,e.gain),t+.001);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g);g.connect(out);o.start(t);o.stop(Math.min(integratedDuration+.14,t+dur+.004));
+   }else{
+    const o=off.createOscillator(),g=off.createGain();o.type='sine';o.frequency.value=Math.max(20,Math.min(18000,e.freq));
+    const t=Math.max(0,e.t),end=Math.min(integratedDuration+.14,e.end);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(Math.min(.95,e.gain),Math.min(end,t+.008));g.gain.setValueAtTime(Math.min(.95,e.gain),Math.max(t+.009,end-.02));g.gain.exponentialRampToValueAtTime(.0001,Math.max(t+.01,end));
+    o.connect(g);g.connect(out);o.start(t);o.stop(Math.max(t+.012,end));
+   }
+  });
+  const rendered=await off.startRendering(),blob=audioBufferToWav(rendered),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='metronomo-extremo-estructura-integrada.wav';a.textContent='Descargar nuevamente el audio WAV';a.style.color='#8cc8ff';a.style.display='inline-block';a.style.marginTop='8px';
+  const status=$('builderStatus');status.textContent='Audio WAV listo. Si la descarga no comienza, toca este enlace: ';status.appendChild(a);
+ }catch(e){setStatus('builderStatus','No se pudo exportar el WAV: '+e.message)}finally{btn.disabled=false}
+}
+function audioBufferToWav(buffer){
+ const channels=buffer.numberOfChannels,length=buffer.length,rate=buffer.sampleRate,bytes=2,align=channels*bytes;
+ const out=new ArrayBuffer(44+length*align),view=new DataView(out);
+ const write=(offset,str)=>{for(let i=0;i<str.length;i++)view.setUint8(offset+i,str.charCodeAt(i))};
+ write(0,'RIFF');view.setUint32(4,36+length*align,true);write(8,'WAVE');write(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,channels,true);view.setUint32(24,rate,true);view.setUint32(28,rate*align,true);view.setUint16(32,align,true);view.setUint16(34,16,true);write(36,'data');view.setUint32(40,length*align,true);
+ const data=Array.from({length:channels},(_,i)=>buffer.getChannelData(i));let offset=44;
+ for(let i=0;i<length;i++)for(let ch=0;ch<channels;ch++){const sample=Math.max(-1,Math.min(1,data[ch][i]));view.setInt16(offset,sample<0?sample*32768:sample*32767,true);offset+=2}
+ return new Blob([out],{type:'audio/wav'});
+}
+$('togglePoly').addEventListener('click',()=>{
+ const editor=$('sectionPolyEditor');editor.hidden=!editor.hidden;
+ $('togglePoly').textContent=editor.hidden?'＋ Agregar polirritmias':'− Quitar polirritmias';
 });
+$('polyVoiceCount').addEventListener('change',()=>{$('polyVoice2Wrap').hidden=$('polyVoiceCount').value!=='2'});
+$('saveSection').addEventListener('click',addSavedSection);
+$('integrateSections').addEventListener('click',integrateSections);
+$('playStructure').addEventListener('click',async()=>{try{await initAudio();playStructure()}catch(e){setStatus('builderStatus','Error de audio: '+e.message)}});
 $('stopStructure').addEventListener('click',()=>{structureActive=false;stopStructureAudio();setStatus('builderStatus','Estructura detenida.')});
+$('downloadStructure').addEventListener('click',downloadIntegratedWav);
 
 function mediaRecorderType(){
  if(!window.MediaRecorder)return '';
@@ -359,8 +444,6 @@ $('recordMetro').addEventListener('click',async()=>{try{await initAudio();startR
 $('stopRecordMetro').addEventListener('click',()=>stopRecording('metro'));
 $('recordPoly').addEventListener('click',async()=>{try{await initAudio();startRecording('poly','polyRecordStatus','recordPoly','stopRecordPoly')}catch(e){setStatus('polyRecordStatus','Error: '+e.message)}});
 $('stopRecordPoly').addEventListener('click',()=>stopRecording('poly'));
-$('recordStructure').addEventListener('click',async()=>{try{await initAudio();startRecording('structure','builderRecordStatus','recordStructure','stopRecordStructure')}catch(e){setStatus('builderRecordStatus','Error: '+e.message)}});
-$('stopRecordStructure').addEventListener('click',()=>stopRecording('structure'));
 
 document.addEventListener('visibilitychange',()=>{
  if(document.hidden){
@@ -370,8 +453,6 @@ document.addEventListener('visibilitychange',()=>{
  }
 });
 $('accent').addEventListener('change',()=>syncTempo($('number').value));
-addSegment({bars:2,tempo:120,num:4,den:4,a:3,b:2,c:0,d:0});
-addSegment({bars:2,tempo:90,num:6,den:8,a:5,b:4,c:3,d:0});
 syncTempo(120);
 })();
 </script>
