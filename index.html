@@ -1,1 +1,254 @@
 
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101218">
+<title>Metrónomo extremo · 50,000 BPM</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:22px 16px 40px;max-width:720px;margin-inline:auto;background:#101218;color:#f4f5f7;font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+h1{font-size:1.9rem;margin:0 0 8px}
+p{color:#b9bfca;line-height:1.45}
+.panel{background:#1c2029;border:1px solid #363c49;border-radius:16px;padding:17px;margin:15px 0}
+.big{font-size:clamp(2.5rem,12vw,4.2rem);font-weight:800;letter-spacing:-.04em;overflow-wrap:anywhere}
+label{display:block;font-weight:650;margin:14px 0 7px}
+input[type=range]{width:100%;min-height:35px;accent-color:#fff}
+input[type=number]{width:100%;padding:13px;border:1px solid #4b5261;border-radius:10px;background:#11141b;color:#fff;font-size:18px}
+button{border:0;border-radius:11px;padding:14px 16px;margin:8px 7px 0 0;font-size:16px;font-weight:750;background:#f2f3f6;color:#171920;cursor:pointer}
+button.secondary{background:#3a4050;color:#fff}
+.status{min-height:1.5em;color:#b8e4c8;margin-top:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.small{font-size:.9rem}
+</style>
+</head>
+<body>
+<h1>Metrónomo extremo</h1>
+<p>Experimental · 1–50,000 BPM · Safari y Chrome.</p>
+
+<section class="panel">
+  <div class="big" id="readout">120 BPM</div>
+  <label for="slider">Tempo</label>
+  <input id="slider" type="range" min="1" max="50000" step="1" value="120">
+  <label for="number">BPM exactos</label>
+  <input id="number" type="number" min="1" max="50000" step="1" inputmode="numeric" value="120">
+  <p id="interval">Intervalo: 500 ms</p>
+  <button id="start">▶ Iniciar audio</button>
+  <button id="stop" class="secondary">■ Detener</button>
+  <div id="status" class="status" role="status">Pulsa Iniciar audio para habilitar el sonido.</div>
+</section>
+
+<section class="panel">
+  <h2>Dos capas polirrítmicas</h2>
+  <p class="small">Combina dos subdivisiones para experimentar con polirritmos.</p>
+  <div class="grid">
+    <div>
+      <label for="a">Capa A (ataques/ciclo)</label>
+      <input id="a" type="number" min="1" max="16" value="3" inputmode="numeric">
+    </div>
+    <div>
+      <label for="b">Capa B (ataques/ciclo)</label>
+      <input id="b" type="number" min="1" max="16" value="2" inputmode="numeric">
+    </div>
+  </div>
+  <label for="cpm">Ciclos por minuto</label>
+  <input id="cpm" type="number" min="1" max="50000" value="120" inputmode="numeric">
+  <button id="poly">▶ Iniciar polirritmo</button>
+  <button id="polyStop" class="secondary">■ Detener</button>
+  <div id="polyStatus" class="status">Relación 3:2</div>
+</section>
+
+<section class="panel small">
+  <strong>Qué esperar</strong>
+  <p>Por debajo de 1,500 BPM se programan clics. A partir de 1,500 BPM se utiliza un tono continuo equivalente a la frecuencia del pulso, porque los clics individuales dejan de ser prácticos a velocidades extremas.</p>
+  <p>A 50,000 BPM, el intervalo matemático es de 1.2 milisegundos. El resultado audible depende del equipo y de la percepción.</p>
+  <p>Si no suena, sube el volumen y vuelve a pulsar Iniciar audio. Mantén esta pestaña visible durante la reproducción.</p>
+</section>
+
+<script>
+(()=>{
+'use strict';
+
+const $=id=>document.getElementById(id);
+let ac=null,master=null,mainTimer=null,mainOsc=null,mainGain=null;
+let active=false,next=0,polyTimer=null,polyActive=false,polyOscs=[];
+const MAX=50000,AHEAD=.12,LOOK=25;
+
+function bpm(v){
+  let n=Number(v);
+  if(!Number.isFinite(n))n=120;
+  return Math.max(1,Math.min(MAX,Math.round(n)));
+}
+
+function sync(v){
+  const n=bpm(v);
+  $('slider').value=n;
+  $('number').value=n;
+  $('readout').textContent=n.toLocaleString('en-US')+' BPM';
+  $('interval').textContent='Intervalo matemático: '+(60000/n).toFixed(n>=1000?4:2)+' ms';
+}
+
+$('slider').addEventListener('input',e=>sync(e.target.value));
+$('number').addEventListener('change',e=>sync(e.target.value));
+
+async function init(){
+  if(!ac){
+    const C=window.AudioContext||window.webkitAudioContext;
+    if(!C)throw Error('Este navegador no admite Web Audio API.');
+    ac=new C();
+    master=ac.createGain();
+    master.gain.value=.22;
+    master.connect(ac.destination);
+  }
+  if(ac.state!=='running')await ac.resume();
+}
+
+function click(t,f=1000,d=.01,v=.6){
+  const o=ac.createOscillator(),g=ac.createGain();
+  o.type='sine';
+  o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.linearRampToValueAtTime(v,t+.001);
+  g.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.003,d));
+  o.connect(g);
+  g.connect(master);
+  o.start(t);
+  o.stop(t+Math.max(.005,d+.003));
+}
+
+function stopMain(){
+  if(mainTimer!==null)clearTimeout(mainTimer);
+  mainTimer=null;
+  if(mainOsc){
+    try{mainOsc.stop()}catch(e){}
+    try{mainOsc.disconnect();mainGain.disconnect()}catch(e){}
+    mainOsc=null;
+    mainGain=null;
+  }
+}
+
+function schedule(){
+  if(!active||!ac)return;
+  const n=bpm($('number').value);
+
+  if(n>=1500){
+    stopMain();
+    mainOsc=ac.createOscillator();
+    mainGain=ac.createGain();
+    mainOsc.type='sine';
+    mainOsc.frequency.value=n/60;
+    mainGain.gain.value=.12;
+    mainOsc.connect(mainGain);
+    mainGain.connect(master);
+    mainOsc.start();
+    $('status').textContent='Tono continuo equivalente: '+(n/60).toFixed(2)+' Hz; no son clics separados.';
+    return;
+  }
+
+  const step=60/n;
+  while(next<ac.currentTime+AHEAD){
+    click(next,1100,.012,.65);
+    next+=step;
+  }
+  mainTimer=setTimeout(schedule,LOOK);
+}
+
+$('start').addEventListener('click',async()=>{
+  try{
+    await init();
+    active=true;
+    stopMain();
+    next=ac.currentTime+.04;
+    $('status').textContent='Audio activo.';
+    schedule();
+  }catch(e){
+    $('status').textContent='Error de audio: '+e.message;
+  }
+});
+
+$('stop').addEventListener('click',()=>{
+  active=false;
+  stopMain();
+  $('status').textContent='Metrónomo detenido.';
+});
+
+function stopPoly(){
+  if(polyTimer!==null)clearTimeout(polyTimer);
+  polyTimer=null;
+  polyOscs.forEach(o=>{try{o.stop()}catch(e){}});
+  polyOscs=[];
+}
+
+$('poly').addEventListener('click',async()=>{
+  try{
+    await init();
+    stopPoly();
+    polyActive=true;
+
+    const a=Math.max(1,Math.min(16,Number($('a').value)||3));
+    const b=Math.max(1,Math.min(16,Number($('b').value)||2));
+    const c=bpm($('cpm').value);
+
+    $('polyStatus').textContent='Relación '+a+':'+b+' · '+c+' ciclos/min.';
+
+    if(c>=1500){
+      [[c*a/60,.09],[c*b/60,.065]].forEach(([f,v])=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.type='sine';
+        o.frequency.value=Math.min(18000,f);
+        g.gain.value=v;
+        o.connect(g);
+        g.connect(master);
+        o.start();
+        polyOscs.push(o);
+      });
+      $('polyStatus').textContent='Textura equivalente: '+(c*a/60).toFixed(2)+' Hz y '+(c*b/60).toFixed(2)+' Hz; no son golpes separados.';
+      return;
+    }
+
+    let start=ac.currentTime+.05,count=0;
+
+    function tick(){
+      if(!polyActive)return;
+      const dur=60/c,now=ac.currentTime;
+
+      while(start<now+AHEAD){
+        for(let i=0;i<a;i++)click(start+i*dur/a,850,.006,.42);
+        for(let i=0;i<b;i++)click(start+i*dur/b,1450,.006,.35);
+        start+=dur;
+
+        if(++count>=100){
+          polyActive=false;
+          $('polyStatus').textContent='Se detuvo tras 100 ciclos para mantener estable el navegador.';
+          return;
+        }
+      }
+      polyTimer=setTimeout(tick,LOOK);
+    }
+    tick();
+  }catch(e){
+    $('polyStatus').textContent='Error de audio: '+e.message;
+  }
+});
+
+$('polyStop').addEventListener('click',()=>{
+  polyActive=false;
+  stopPoly();
+  $('polyStatus').textContent='Polirritmo detenido.';
+});
+
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden&&active){
+    active=false;
+    stopMain();
+    $('status').textContent='Audio pausado al salir de esta pestaña. Pulsa Iniciar para reanudar.';
+  }
+});
+
+sync(120);
+})();
+</script>
+</body>
+</html>
