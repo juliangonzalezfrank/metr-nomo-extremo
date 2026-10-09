@@ -73,6 +73,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
     <div class="field"><label for="accent">Acento de compás</label><select id="accent"><option value="strong" selected>Fuerte en tiempo 1</option><option value="two">Fuerte 1 · medio 3/4</option><option value="compound">Compuesto (ej. 6/8: 1 y 4)</option><option value="none">Sin acento especial</option></select></div>
   </div>
   <p id="interval">Intervalo de negra: 500 ms</p>
+  <p id="thresholdInfo" class="note"><strong>Cómo funciona el rango extremo:</strong> de 1 a 1,499 BPM se generan golpes separados. Desde 1,500 BPM se usa un tono continuo equivalente, porque los golpes se vuelven demasiado rápidos para distinguirlos con claridad. El intervalo de una negra se calcula como 60,000 ÷ BPM; a 50,000 BPM equivale a 1.2 ms.</p>
   <p class="note">Convención: el BPM indica negras por minuto. El metrónomo pulsa la figura del denominador: por ejemplo, en 6/8 escuchas seis corcheas por compás. El primer tiempo suena más fuerte; en compases compuestos puedes acentuar también el inicio del segundo grupo.</p>
   <button id="start">▶ Iniciar metrónomo</button><button id="stop" class="secondary">■ Detener</button>
   <button id="recordMetro" class="secondary">● Grabar audio</button><button id="stopRecordMetro" class="danger" disabled>■ Terminar y guardar</button>
@@ -98,6 +99,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
   <button id="polyStart">▶ Iniciar polirritmia</button><button id="polyStop" class="secondary">■ Detener</button>
   <button id="recordPoly" class="secondary">● Grabar audio</button><button id="stopRecordPoly" class="danger" disabled>■ Terminar y guardar</button>
   <div id="polyStatus" class="status">Relación 3:2:5:4 · elige las voces que quieras escuchar.</div>
+  <p class="note">Cada voz genera ataques repartidos uniformemente dentro de un ciclo. Cuando una voz supera aproximadamente 25 ataques por segundo, se representa con un tono continuo equivalente para evitar una programación excesiva de clics.</p>
   <div id="polyRecordStatus" class="status"></div>
 </section>
 
@@ -139,7 +141,7 @@ function voiceCount(id){return clampInt($(id).value,0,16,0)}
 function setStatus(id,msg){$(id).textContent=msg}
 function syncTempo(v){
  const n=bpm(v);$('slider').value=n;$('number').value=n;$('readout').textContent=n.toLocaleString('en-US')+' BPM';
- const m=meter();setStatus('interval','Intervalo de negra: '+(60000/n).toFixed(n>=1000?4:2)+' ms · Compás '+m.num+'/'+m.den);
+ const m=meter();const quarter=60000/n;const pulse=quarter*4/m.den;setStatus('interval','Intervalo de negra: '+quarter.toFixed(n>=1000?4:2)+' ms · Pulso de '+m.den+': '+pulse.toFixed(n>=1000?4:2)+' ms · Compás '+m.num+'/'+m.den);
 }
 $('slider').addEventListener('input',e=>syncTempo(e.target.value));
 $('number').addEventListener('change',e=>syncTempo(e.target.value));
@@ -205,7 +207,7 @@ function currentPolyVoices(){
   {id:'b',mute:'muteB',freq:1000,level:.36,name:'B'},
   {id:'c',mute:'muteC',freq:1350,level:.31,name:'C'},
   {id:'d',mute:'muteD',freq:1700,level:.28,name:'D'}
- ].map(v=>({...v,count:$(v.id).checked?voiceCount(v.id):0}));
+ ].map(v=>({...v,count:$(v.mute).checked?voiceCount(v.id):0}));
 }
 function stopPolyAudio(){
  if(polyTimer!==null)clearTimeout(polyTimer);polyTimer=null;
@@ -232,8 +234,9 @@ function startPolyScheduler(){
   const rate=cpm*v.count/60;
   if(v.count>0&&rate>=25){const tone=sustained(rate,v.level*.45);polyOscs.push(tone);continuous.push(v.name+' '+rate.toFixed(1)+' Hz')}
  });
- if(continuous.length)setStatus('polyStatus','Voces continuas por velocidad: '+continuous.join(' · '));
+ if(continuous.length)setStatus('polyStatus','Voces continuas por velocidad: '+continuous.join(' · ')+' · Relación '+voices.map(v=>v.count||'—').join(':'));
  else setStatus('polyStatus','Relación activa: '+voices.map(v=>v.count||'—').join(':')+' · '+cpm+' ciclos/min.');
+ if(voices.every(v=>v.count===0))setStatus('polyStatus','Todas las voces están silenciadas. Activa al menos una voz para escuchar la polirritmia.');
  function tick(){
   if(!polyActive)return;
   const now=ac.currentTime;
