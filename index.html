@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101218">
-<title>Metrónomo Extremo 50K · Estudio rítmico</title>
+<title>Metrónomo Extremo 50K · Laboratorio rítmico</title>
 <style>
 :root{color-scheme:dark;--bg:#101218;--panel:#1c2029;--line:#363c49;--muted:#b9bfca;--accent:#f2f3f6;--green:#b8e4c8;--blue:#8cc8ff}
 *{box-sizing:border-box}
@@ -49,6 +49,12 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .segment-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .segment-top button{margin:0;padding:8px 10px}
 .voice-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+
+.multi-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);background:#151821;border-radius:12px;padding:11px 12px;margin:8px 0}
+.multi-row .row-label{font-weight:800;min-width:0;overflow-wrap:anywhere}
+.multi-row .row-detail{display:block;color:var(--muted);font-size:.86rem;font-weight:400;margin-top:3px}
+.multi-row button{margin:0;padding:9px 11px;flex-shrink:0}
+
 hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 @media(max-width:560px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}.grid4,.voice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:13px}.big{font-size:clamp(2.2rem,12vw,3.5rem)}}
 </style>
@@ -57,8 +63,8 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <header>
   <div class="eyebrow">Laboratorio de ritmo · Versión ampliada</div>
   <h1>Metrónomo Extremo 50K</h1>
-  <p>Compases, acentos, polirritmias de cuatro voces y diseño de estructuras rítmicas. Para mejores resultados, mantén esta página abierta mientras suena.</p>
-  <nav class="tabs"><a href="#metro">1 · Metrónomo</a><a href="#poly">2 · Polirritmias</a><a href="#builder">3 · Estructura</a></nav>
+  <p>Compases, acentos, polirritmias, polimetrías, politempos y estructuras rítmicas. Para mejores resultados, mantén esta página abierta mientras suena.</p>
+  <nav class="tabs"><a href="#metro">1 · Metrónomo</a><a href="#poly">2 · Polirritmias</a><a href="#polymeter">3 · Polimetrías</a><a href="#polytempo">4 · Politempos</a><a href="#builder">5 · Estructuras</a></nav>
 </header>
 
 <section class="panel" id="metro">
@@ -103,8 +109,41 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
   <div id="polyRecordStatus" class="status"></div>
 </section>
 
+
+<section class="panel" id="polymeter">
+  <h2>3. Polimetrías simultáneas</h2>
+  <p>Agrega de 1 a 6 compases distintos para que suenen simultáneamente al mismo tempo. Cada línea conserva su propio ciclo y acentúa el inicio de su compás.</p>
+  <div class="grid">
+    <div class="field"><label for="pmTempo">Tempo común (BPM)</label><input id="pmTempo" type="number" min="1" max="50000" value="120" inputmode="numeric"></div>
+    <div class="field"><label for="pmNum">Numerador del nuevo compás</label><select id="pmNum"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>15</option><option>16</option></select></div>
+    <div class="field"><label for="pmDen">Denominador</label><select id="pmDen"><option>2</option><option selected>4</option><option>8</option><option>16</option></select></div>
+    <div class="field" style="align-self:end"><button id="pmAdd" type="button">＋ Agregar compás</button></div>
+  </div>
+  <h3>Compases simultáneos <span class="note">(máximo 6)</span></h3>
+  <div id="pmList"><p class="note" id="pmEmpty">Agrega el primer compás para comenzar.</p></div>
+  <button id="pmStart">▶ Iniciar polimetría</button><button id="pmStop" class="secondary">■ Detener</button>
+  <div id="pmStatus" class="status">Cada compás tendrá su propio ciclo de acentos.</div>
+  <p class="note">El BPM común representa negras por minuto. En cada línea, el denominador define la figura del pulso y el numerador determina cuántos pulsos tiene su compás.</p>
+</section>
+
+<section class="panel" id="polytempo">
+  <h2>4. Politempos simultáneos</h2>
+  <p>Agrega de 1 a 6 líneas con tempos independientes. Cada línea puede tener también su propio compás para marcar los acentos mientras los tempos avanzan en paralelo.</p>
+  <div class="grid">
+    <div class="field"><label for="ptBpm">BPM de la nueva línea</label><input id="ptBpm" type="number" min="1" max="50000" value="120" inputmode="numeric"></div>
+    <div class="field"><label for="ptNum">Numerador</label><select id="ptNum"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>15</option><option>16</option></select></div>
+    <div class="field"><label for="ptDen">Denominador</label><select id="ptDen"><option>2</option><option selected>4</option><option>8</option><option>16</option></select></div>
+    <div class="field" style="align-self:end"><button id="ptAdd" type="button">＋ Agregar tempo</button></div>
+  </div>
+  <h3>Tempos simultáneos <span class="note">(máximo 6)</span></h3>
+  <div id="ptList"><p class="note" id="ptEmpty">Agrega el primer tempo para comenzar.</p></div>
+  <button id="ptStart">▶ Iniciar politempo</button><button id="ptStop" class="secondary">■ Detener</button>
+  <div id="ptStatus" class="status">Cada línea tendrá un tempo y un ciclo de acentos independientes.</div>
+  <p class="note">Los BPM indican negras por minuto. Si una línea alcanza 1,500 BPM o más, usa un tono continuo equivalente en lugar de golpes separados.</p>
+</section>
+
 <section class="panel" id="builder">
-  <h2>3. Diseñador de estructuras rítmicas</h2>
+  <h2>5. Diseñador de estructuras rítmicas</h2>
   <p>Diseña cada sección por separado. Define tempo, compás y duración; después puedes añadir una o dos voces polirrítmicas que harán esa cantidad de ataques en cada compás. Al terminar, integra las secciones para reproducirlas en orden o descargar toda la estructura como audio WAV.</p>
   <div class="segment" id="sectionEditor">
     <h3>Nueva sección</h3>
@@ -152,6 +191,8 @@ const MAX=50000,AHEAD=.12,LOOK=25;
 let ac=null,master=null,recordDest=null;
 let metroActive=false,metroTimer=null,metroNext=0,metroOsc=null,metroGain=null,metroBeat=0;
 let polyActive=false,polyTimer=null,polyNext=[],polyOscs=[],swingFrame=null,swingStart=0,swingRate=120;
+let polymeterActive=false,polymeterTimer=null,polymeterOscs=[],polymeterLanes=[];
+let polytempoActive=false,polytempoTimer=null,polytempoOscs=[],polytempoLanes=[];
 let structureActive=false,structureTimer=null,structureOscs=[],structureStartedAt=0;
 let recorders={metro:null,poly:null,structure:null},recordChunks={metro:[],poly:[],structure:[]};
 
@@ -283,6 +324,114 @@ $('polyStart').addEventListener('click',async()=>{
  }catch(e){setStatus('polyStatus','Error de audio: '+e.message)}
 });
 $('polyStop').addEventListener('click',()=>{polyActive=false;stopPolyAudio();stopSwing();setStatus('polyStatus','Polirritmia detenida.');setStatus('pendulumCaption','Barra detenida.')});
+
+
+// Polimetrías: varios compases simultáneos al mismo tempo.
+let polymeterRows=[];
+function renderPolymeterRows(){
+ const list=$('pmList');list.innerHTML='';
+ if(!polymeterRows.length){list.innerHTML='<p class="note">Agrega el primer compás para comenzar.</p>';return}
+ polymeterRows.forEach((item,i)=>{
+  const row=document.createElement('div');row.className='multi-row';
+  row.innerHTML=`<div class="row-label">Compás ${i+1}: ${item.num}/${item.den}<span class="row-detail">Tempo común: ${bpm($('pmTempo').value)} BPM · Voz ${String.fromCharCode(65+i)}</span></div><button type="button" class="danger">Eliminar</button>`;
+  row.querySelector('button').addEventListener('click',()=>{polymeterRows.splice(i,1);renderPolymeterRows();setStatus('pmStatus','Compás eliminado. Detén y reinicia la reproducción para aplicar los cambios.')});
+  list.appendChild(row);
+ });
+}
+$('pmAdd').addEventListener('click',()=>{
+ if(polymeterRows.length>=6){setStatus('pmStatus','Ya tienes el máximo de 6 compases simultáneos.');return}
+ polymeterRows.push({num:clampInt($('pmNum').value,1,16,4),den:clampInt($('pmDen').value,2,16,4)});
+ renderPolymeterRows();setStatus('pmStatus',`Añadidos ${polymeterRows.length} compás(es). Pulsa Iniciar polimetría para escucharlos.`);
+});
+$('pmTempo').addEventListener('change',renderPolymeterRows);
+function stopPolymeter(){
+ polymeterActive=false;if(polymeterTimer!==null)clearTimeout(polymeterTimer);polymeterTimer=null;stopOscList(polymeterOscs);polymeterLanes=[];
+}
+function startPolymeterScheduler(){
+ const tempo=bpm($('pmTempo').value);
+ if(!polymeterRows.length){setStatus('pmStatus','Agrega al menos un compás antes de iniciar.');return}
+ polymeterLanes=polymeterRows.map((m,i)=>({...m,i,next:ac.currentTime+.06,beat:0,continuous:false}));
+ const colors=[650,850,1050,1250,1450,1650];
+ polymeterLanes.forEach(l=>{
+  const pulseRate=tempo*4/l.den/60;
+  if(tempo>=1500||pulseRate>=25){l.continuous=true;polymeterOscs.push(sustained(Math.min(18000,Math.max(20,pulseRate)),.045))}
+ });
+ setStatus('pmStatus',`Polimetría activa · ${polymeterLanes.length} compases simultáneos · ${tempo} BPM.`);
+ function tick(){
+  if(!polymeterActive)return;
+  const now=ac.currentTime;
+  polymeterLanes.forEach(l=>{
+   const pulseRate=tempo*4/l.den/60;
+   if(l.continuous||pulseRate>=25)return;
+   const interval=60/pulseRate;
+   while(l.next<now+AHEAD){
+    const isOne=l.beat===0,isMid=l.num>=6&&l.num%3===0&&l.beat===l.num/2;
+    clickAt(l.next,isOne?1800:colors[l.i],.012,isOne?.86:(isMid?.55:.30));
+    l.next+=interval;l.beat=(l.beat+1)%l.num;
+   }
+  });
+  polymeterTimer=setTimeout(tick,LOOK);
+ }
+ tick();
+}
+$('pmStart').addEventListener('click',async()=>{
+ try{await initAudio();stopPolymeter();polymeterActive=true;startPolymeterScheduler()}
+ catch(e){setStatus('pmStatus','Error de audio: '+e.message)}
+});
+$('pmStop').addEventListener('click',()=>{stopPolymeter();setStatus('pmStatus','Polimetría detenida.')});
+
+// Politempos: varios BPM simultáneos, con compás independiente por línea.
+let polytempoRows=[];
+function renderPolytempoRows(){
+ const list=$('ptList');list.innerHTML='';
+ if(!polytempoRows.length){list.innerHTML='<p class="note">Agrega el primer tempo para comenzar.</p>';return}
+ polytempoRows.forEach((item,i)=>{
+  const row=document.createElement('div');row.className='multi-row';
+  row.innerHTML=`<div class="row-label">Tempo ${i+1}: ${item.tempo.toLocaleString('en-US')} BPM<span class="row-detail">Compás ${item.num}/${item.den} · Voz ${String.fromCharCode(65+i)}</span></div><button type="button" class="danger">Eliminar</button>`;
+  row.querySelector('button').addEventListener('click',()=>{polytempoRows.splice(i,1);renderPolytempoRows();setStatus('ptStatus','Tempo eliminado. Detén y reinicia la reproducción para aplicar los cambios.')});
+  list.appendChild(row);
+ });
+}
+$('ptAdd').addEventListener('click',()=>{
+ if(polytempoRows.length>=6){setStatus('ptStatus','Ya tienes el máximo de 6 tempos simultáneos.');return}
+ polytempoRows.push({tempo:bpm($('ptBpm').value),num:clampInt($('ptNum').value,1,16,4),den:clampInt($('ptDen').value,2,16,4)});
+ renderPolytempoRows();setStatus('ptStatus',`Añadidas ${polytempoRows.length} línea(s) de tempo. Pulsa Iniciar politempo para escucharlas.`);
+});
+function stopPolytempo(){
+ polytempoActive=false;if(polytempoTimer!==null)clearTimeout(polytempoTimer);polytempoTimer=null;stopOscList(polytempoOscs);polytempoLanes=[];
+}
+function startPolytempoScheduler(){
+ if(!polytempoRows.length){setStatus('ptStatus','Agrega al menos un tempo antes de iniciar.');return}
+ polytempoLanes=polytempoRows.map((m,i)=>({...m,i,next:ac.currentTime+.06,beat:0,continuous:false}));
+ const colors=[700,900,1100,1300,1500,1700];
+ polytempoLanes.forEach(l=>{
+  const pulseRate=l.tempo*4/l.den/60;
+  if(l.tempo>=1500||pulseRate>=25){l.continuous=true;polytempoOscs.push(sustained(Math.min(18000,Math.max(20,pulseRate)),.04))}
+ });
+ setStatus('ptStatus',`Politempo activo · ${polytempoLanes.length} tempos simultáneos: ${polytempoLanes.map(l=>l.tempo).join(' / ')} BPM.`);
+ function tick(){
+  if(!polytempoActive)return;
+  const now=ac.currentTime;
+  polytempoLanes.forEach(l=>{
+   const pulseRate=l.tempo*4/l.den/60;
+   if(l.continuous||pulseRate>=25)return;
+   const interval=60/pulseRate;
+   while(l.next<now+AHEAD){
+    const isOne=l.beat===0,isMid=l.num>=6&&l.num%3===0&&l.beat===l.num/2;
+    clickAt(l.next,isOne?1900:colors[l.i],.012,isOne?.86:(isMid?.55:.30));
+    l.next+=interval;l.beat=(l.beat+1)%l.num;
+   }
+  });
+  polytempoTimer=setTimeout(tick,LOOK);
+ }
+ tick();
+}
+$('ptStart').addEventListener('click',async()=>{
+ try{await initAudio();stopPolytempo();polytempoActive=true;startPolytempoScheduler()}
+ catch(e){setStatus('ptStatus','Error de audio: '+e.message)}
+});
+$('ptStop').addEventListener('click',()=>{stopPolytempo();setStatus('ptStatus','Politempo detenido.')});
+
 
 function stopStructureAudio(){
  if(structureTimer!==null)clearTimeout(structureTimer);structureTimer=null;
@@ -449,6 +598,8 @@ document.addEventListener('visibilitychange',()=>{
  if(document.hidden){
   if(metroActive){metroActive=false;stopMetroAudio();setStatus('status','Metrónomo detenido al salir de la pestaña.')}
   if(polyActive){polyActive=false;stopPolyAudio();stopSwing();setStatus('polyStatus','Polirritmia detenida al salir de la pestaña.')}
+  if(polymeterActive){stopPolymeter();setStatus('pmStatus','Polimetría detenida al salir de la pestaña.')}
+  if(polytempoActive){stopPolytempo();setStatus('ptStatus','Politempo detenido al salir de la pestaña.')}
   if(structureActive){structureActive=false;stopStructureAudio();setStatus('builderStatus','Estructura detenida al salir de la pestaña.')}
  }
 });
