@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101218">
-<title>Metrónomo Extremo 50K · Laboratorio rítmico</title>
+<title>Laboratorio de Ritmo · Herramientas de exploración musical</title>
 <style>
 :root{color-scheme:dark;--bg:#101218;--panel:#1c2029;--line:#363c49;--muted:#b9bfca;--accent:#f2f3f6;--green:#b8e4c8;--blue:#8cc8ff}
 *{box-sizing:border-box}
@@ -15,6 +15,10 @@ h2{font-size:1.3rem;margin:0 0 8px}
 h3{font-size:1.02rem;margin:0 0 8px}
 p{color:var(--muted);line-height:1.45}
 header{padding:6px 2px 14px}
+.brand-lockup{display:flex;align-items:center;gap:16px;padding:8px 0 14px}
+.brand-mark{width:76px;height:76px;flex:0 0 76px;color:#f2f3f6}
+.brand-sub{margin:7px 0 3px}.brand-origin{font-size:.78rem;letter-spacing:.07em;color:var(--muted)}
+@media(max-width:420px){.brand-lockup{gap:10px}.brand-mark{width:56px;height:56px;flex-basis:56px}.brand-lockup h1{font-size:1.65rem}}
 .eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:800}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
 .big{font-size:clamp(2.5rem,12vw,4.2rem);font-weight:850;letter-spacing:-.045em;overflow-wrap:anywhere;line-height:1.05}
@@ -64,10 +68,18 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 </head>
 <body>
 <header>
-  <div class="eyebrow">Laboratorio de ritmo · Versión 4.2</div>
-  <h1>Metrónomo Extremo 50K</h1>
-  <p>Compases, acentos, polirritmias, polimetrías, politempos y estructuras rítmicas. Para mejores resultados, mantén esta página abierta mientras suena.</p>
-  <nav class="tabs"><a href="#metro">1 · Metrónomo</a><a href="#poly">2 · Polirritmias</a><a href="#polymeter">3 · Polimetrías</a><a href="#polytempo">4 · Politempos</a><a href="#builder">5 · Estructuras</a></nav>
+  <div class="brand-lockup">
+    <svg class="brand-mark" viewBox="0 0 80 80" role="img" aria-label="Logo de Laboratorio de Ritmo">
+      <circle cx="40" cy="40" r="34" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 4" opacity=".7"/>
+      <circle cx="40" cy="40" r="24" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <circle cx="40" cy="40" r="14" fill="none" stroke="var(--blue)" stroke-width="2"/>
+      <path d="M40 5V75M5 40H75" stroke="currentColor" stroke-width="1" opacity=".35"/>
+      <circle cx="40" cy="40" r="5" fill="var(--green)"/>
+      <circle cx="40" cy="16" r="3" fill="var(--blue)"/><circle cx="64" cy="40" r="3" fill="var(--blue)"/><circle cx="40" cy="64" r="3" fill="var(--blue)"/><circle cx="16" cy="40" r="3" fill="var(--blue)"/>
+    </svg>
+    <div><div class="eyebrow">Exploración · Tiempo · Composición</div><h1>Laboratorio de Ritmo</h1><p class="brand-sub">Un entorno para investigar, diseñar y escuchar estructuras rítmicas.</p><span class="brand-origin">Metrónomo Extremo 50K · Versión 5.0</span></div>
+  </div>
+  <nav class="tabs"><a href="#metro">1 · Metrónomo</a><a href="#poly">2 · Polirritmias</a><a href="#polymeter">3 · Polimetrías</a><a href="#polytempo">4 · Politempos</a><a href="#tempoCurves">5 · Progresiones</a><a href="#builder">6 · Estructuras</a></nav>
 </header>
 
 <section class="panel" id="metro">
@@ -221,8 +233,47 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
   <p class="note">Los BPM indican negras por minuto. Si una línea alcanza 1,500 BPM o más, usa un tono continuo equivalente en lugar de golpes separados. Puedes configurar hasta 999 líneas, aunque reproducir cientos simultáneamente puede sobrecargar el dispositivo; aumenta la cantidad poco a poco.</p>
 </section>
 
+
+<section class="panel" id="tempoCurves">
+  <h2>5. Progresiones de tempo</h2>
+  <p>Crea voces cuyo tempo evoluciona en el tiempo: por ejemplo, de 60 a 140 BPM y de regreso a 60, mientras otra voz recorre el camino contrario. Cada voz tiene su propia curva, compás y duración de ciclo.</p>
+  <div class="grid">
+    <div class="field"><label for="tcStart">BPM inicial</label><input id="tcStart" type="number" min="1" max="50000" value="60" inputmode="numeric"></div>
+    <div class="field"><label for="tcPeak">BPM extremo</label><input id="tcPeak" type="number" min="1" max="50000" value="140" inputmode="numeric"></div>
+    <div class="field"><label for="tcEnd">BPM final del ciclo</label><input id="tcEnd" type="number" min="1" max="50000" value="60" inputmode="numeric"></div>
+    <div class="field"><label for="tcCycle">Duración del ciclo (segundos)</label><input id="tcCycle" type="number" min="2" max="3600" value="16" inputmode="numeric"></div>
+    <div class="field"><label for="tcNum">Numerador</label><select id="tcNum"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>15</option><option>16</option></select></div>
+    <div class="field"><label for="tcDen">Denominador</label><select id="tcDen"><option>2</option><option selected>4</option><option>8</option><option>16</option></select></div>
+    <div class="field" style="align-self:end"><button id="tcAdd" type="button">＋ Agregar progresión</button><button id="tcPair" type="button" class="secondary">＋ Pareja opuesta</button></div>
+  </div>
+  <p class="note">La curva recorre BPM inicial → BPM extremo durante la primera mitad del ciclo y BPM extremo → BPM final durante la segunda mitad. El ciclo se repite mientras esté sonando. La variación se actualiza golpe a golpe; el resultado depende de la resolución de audio del navegador.</p>
+  <h3>Voces de tempo <span class="note">(máximo 999)</span></h3>
+  <div id="tcList"><p class="note">Agrega una progresión para comenzar.</p></div>
+  <div class="segment sampler-panel" id="samplerPanelRamp">
+    <h3>Sampler de audio · Progresiones</h3>
+    <label for="sampleFileRamp">Subir audio (MP3, WAV, M4A u otro formato compatible)</label>
+    <input id="sampleFileRamp" type="file">
+    <p class="note">En iPhone: elige “Explorar” y busca el audio en la app Archivos. Si está en Música, WhatsApp o Notas de Voz, primero compártelo/guárdalo en Archivos.</p>
+    <div class="grid3">
+      <div class="field"><label for="sampleStartRamp">Recorte desde (s)</label><input id="sampleStartRamp" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+      <div class="field"><label for="sampleEndRamp">Recorte hasta (s)</label><input id="sampleEndRamp" type="number" min="0.01" step="0.01" value="1" inputmode="decimal"></div>
+      <div class="field"><label>Duración</label><div id="sampleDurationRamp" class="status">Sin archivo</div></div>
+    </div>
+    <label class="mute"><input id="sampleUseRamp" type="checkbox" checked> Usar el fragmento como sonido de cada golpe</label>
+    <button type="button" class="secondary" id="samplePreviewRamp">▶ Escuchar fragmento</button>
+    <button type="button" class="secondary" id="sampleAnalyzeRamp">⌁ Estimar BPM</button>
+    <button type="button" class="secondary" id="sampleClearRamp">Quitar audio</button>
+    <div id="sampleStatusRamp" class="status">Sube un audio para recortar y usarlo como sampler.</div>
+  </div>
+  <button id="tcStartPlay">▶ Iniciar progresiones</button><button id="tcStopPlay" class="secondary">■ Detener</button>
+  <button id="recordRamp" class="secondary">● Grabar audio</button><button id="stopRecordRamp" class="danger" disabled>■ Terminar y guardar</button>
+  <div id="tcStatus" class="status">Agrega una o más voces. Cada una seguirá su propia progresión de tempo.</div>
+  <div id="tcRecordStatus" class="status"></div>
+  <p class="note">Puedes configurar hasta 999 voces, aunque reproducir muchas simultáneamente puede sobrecargar el iPhone. Para progresiones que lleguen a tempos extremos, prueba primero con pocas voces y verifica el resultado.</p>
+</section>
+
 <section class="panel" id="builder">
-  <h2>5. Diseñador de estructuras rítmicas</h2>
+  <h2>6. Diseñador de estructuras rítmicas</h2>
   <p>Diseña cada sección por separado. Define tempo, compás y duración; después puedes añadir una o dos voces polirrítmicas que harán esa cantidad de ataques en cada compás. Al terminar, integra las secciones para reproducirlas en orden o descargar toda la estructura como audio WAV.</p>
   <div class="segment" id="sectionEditor">
     <h3>Nueva sección</h3>
@@ -291,7 +342,8 @@ let polyActive=false,polyTimer=null,polyNext=[],polyOscs=[],swingFrame=null,swin
 let polymeterActive=false,polymeterTimer=null,polymeterOscs=[],polymeterLanes=[];
 let polytempoActive=false,polytempoTimer=null,polytempoOscs=[],polytempoLanes=[];
 let structureActive=false,structureTimer=null,structureOscs=[],structureStartedAt=0;
-let recorders={metro:null,poly:null,pm:null,pt:null,structure:null},recordChunks={metro:[],poly:[],pm:[],pt:[],structure:[]};
+let tempoCurvesActive=false,tempoCurvesTimer=null,tempoCurveOscs=[],tempoCurveLanes=[];
+let recorders={metro:null,poly:null,pm:null,pt:null,ramp:null,structure:null},recordChunks={metro:[],poly:[],pm:[],pt:[],ramp:[],structure:[]};
 
 function clampInt(v,min,max,def){const n=Number(v);return Number.isFinite(n)?Math.max(min,Math.min(max,Math.round(n))):def}
 function bpm(v){return clampInt(v,1,MAX,120)}
@@ -326,8 +378,8 @@ function clickAt(t,f=1000,d=.012,v=.6){
  o.connect(g);g.connect(master);o.start(t);o.stop(t+Math.max(.006,d+.004));
 }
 // Samplers locales: cada módulo mantiene su propio audio y región de recorte.
-const samplers={Metro:null,Poly:null,Pm:null,Pt:null,Structure:null};
-function sampleKeyForModule(key){return key==='metro'?'Metro':key==='poly'?'Poly':key==='pm'?'Pm':key==='pt'?'Pt':'Structure'}
+const samplers={Metro:null,Poly:null,Pm:null,Pt:null,Ramp:null,Structure:null};
+function sampleKeyForModule(key){return key==='metro'?'Metro':key==='poly'?'Poly':key==='pm'?'Pm':key==='pt'?'Pt':key==='ramp'?'Ramp':'Structure'}
 function sampleTrim(key){
  const s=samplers[key];if(!s)return null;
  const start=Math.max(0,Math.min(s.buffer.duration-.01,Number($('sampleStart'+key).value)||0));
@@ -382,7 +434,7 @@ function setupSampler(key){
  $('sampleClear'+key).addEventListener('click',()=>{samplers[key]=null;$('sampleFile'+key).value='';$('sampleStart'+key).value='0';$('sampleEnd'+key).value='1';$('sampleDuration'+key).textContent='Sin archivo';setStatus('sampleStatus'+key,'Sampler quitado; se usarán los sonidos internos.');});
  ['sampleStart'+key,'sampleEnd'+key].forEach(id=>$(id).addEventListener('change',()=>{const s=samplers[key];if(!s)return;const tr=sampleTrim(key);$('sampleStart'+key).value=tr.start.toFixed(2);$('sampleEnd'+key).value=tr.end.toFixed(2)}));
 }
-['Metro','Poly','Pm','Pt','Structure'].forEach(setupSampler);
+['Metro','Poly','Pm','Pt','Ramp','Structure'].forEach(setupSampler);
 
 function sustained(freq,gain=.08){
  const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=Math.max(20,Math.min(18000,freq));g.gain.value=gain;o.connect(g);g.connect(master);o.start();return {o,g};
@@ -624,6 +676,78 @@ $('ptStart').addEventListener('click',async()=>{
 $('ptStop').addEventListener('click',()=>{stopPolytempo();setStatus('ptStatus','Politempo detenido.')});
 
 
+
+// Progresiones de tempo: cada voz recorre una curva BPM inicial -> extremo -> final.
+let tempoCurveRows=[];
+function renderTempoCurveRows(){
+ const list=$('tcList');list.innerHTML='';
+ if(!tempoCurveRows.length){list.innerHTML='<p class="note">Agrega una progresión para comenzar.</p>';return}
+ tempoCurveRows.forEach((item,i)=>{
+  const row=document.createElement('div');row.className='multi-row';
+  row.innerHTML=`<div class="row-label"><span style="color:${['#8cc8ff','#ff8d8d','#b8e4c8','#ffc078','#c4a7ff','#ffb6d9'][i%6]}">●</span> Voz ${i+1}: ${item.start} → ${item.peak} → ${item.end} BPM<span class="row-detail">Ciclo ${item.cycle}s · Compás ${item.num}/${item.den}</span></div><button type="button" class="danger">Eliminar</button>`;
+  row.querySelector('button').addEventListener('click',()=>{tempoCurveRows.splice(i,1);renderTempoCurveRows();setStatus('tcStatus','Progresión eliminada. Detén y reinicia para aplicar los cambios.')});
+  list.appendChild(row);
+ });
+}
+$('tcPair').addEventListener('click',()=>{
+ if(tempoCurveRows.length>997){setStatus('tcStatus','No hay espacio para agregar las dos voces.');return}
+ const cycle=clampInt($('tcCycle').value,2,3600,16),num=clampInt($('tcNum').value,1,16,4),den=clampInt($('tcDen').value,2,16,4);
+ tempoCurveRows.push({start:60,peak:140,end:60,cycle,num,den},{start:140,peak:60,end:140,cycle,num,den});
+ renderTempoCurveRows();setStatus('tcStatus','Pareja opuesta agregada: 60 → 140 → 60 BPM y 140 → 60 → 140 BPM.');
+});
+$('tcAdd').addEventListener('click',()=>{
+ if(tempoCurveRows.length>=999){setStatus('tcStatus','Llegaste al máximo de 999 voces.');return}
+ const start=clampInt($('tcStart').value,1,MAX,60),peak=clampInt($('tcPeak').value,1,MAX,140),end=clampInt($('tcEnd').value,1,MAX,start),cycle=clampInt($('tcCycle').value,2,3600,16);
+ tempoCurveRows.push({start,peak,end,cycle,num:clampInt($('tcNum').value,1,16,4),den:clampInt($('tcDen').value,2,16,4)});
+ renderTempoCurveRows();setStatus('tcStatus',`Añadida voz ${tempoCurveRows.length}: ${start} → ${peak} → ${end} BPM. Puedes agregar la voz contraria cambiando inicial, extremo y final.`);
+});
+function tempoCurveAt(l,elapsed){
+ const phase=((Math.max(0,elapsed)%l.cycle)/l.cycle);
+ if(phase<.5)return l.start+(l.peak-l.start)*(phase*2);
+ return l.peak+(l.end-l.peak)*((phase-.5)*2);
+}
+function stopTempoCurves(){
+ tempoCurvesActive=false;if(tempoCurvesTimer!==null)clearTimeout(tempoCurvesTimer);tempoCurvesTimer=null;stopOscList(tempoCurveOscs);tempoCurveLanes=[];
+}
+function startTempoCurves(){
+ if(!tempoCurveRows.length){setStatus('tcStatus','Agrega al menos una progresión antes de iniciar.');tempoCurvesActive=false;return}
+ const colors=[700,950,1200,1450,1650,1850];
+ const origin=ac.currentTime+.10;
+ tempoCurveLanes=tempoCurveRows.map((r,i)=>({...r,i,beat:0,next:origin,origin,continuous:false}));
+ setStatus('tcStatus',`Progresiones activas · ${tempoCurveLanes.length} voces. El BPM de cada voz cambia de forma continua a lo largo de su ciclo.`);
+ function tick(){
+  if(!tempoCurvesActive)return;
+  try{
+   if(ac.state!=='running'){ac.resume().catch(()=>{});tempoCurvesTimer=setTimeout(tick,50);return}
+   const now=ac.currentTime;
+   for(const l of tempoCurveLanes){
+    let guard=0;
+    while(l.next<now+AHEAD && guard<500){
+     const elapsed=Math.max(0,l.next-l.origin),tempo=Math.max(1,Math.min(MAX,tempoCurveAt(l,elapsed)));
+     const pulseRate=tempo*l.den/240;
+     if(pulseRate>=25||tempo>=1500){
+      // Evita colapsar el planificador en tempos donde los clics dejan de distinguirse.
+      if(!l.osc){const osc=sustained(Math.min(18000,Math.max(20,pulseRate)),.0001);tempoCurveOscs.push(osc);l.osc=osc}
+      l.continuous=true;
+      if(l.osc&&l.osc.o&&l.osc.o.frequency)l.osc.o.frequency.setTargetAtTime(Math.min(18000,Math.max(20,pulseRate)),now,.04);
+      if(l.osc&&l.osc.g)l.osc.g.gain.setTargetAtTime(.035,now,.025);
+      l.next=now+AHEAD+.03;break;
+     }
+     if(l.continuous&&l.osc&&l.osc.g)l.osc.g.gain.setTargetAtTime(.0001,now,.025);
+     l.continuous=false;
+     const accent=l.beat===0,mid=l.num>=6&&l.num%3===0&&l.beat===l.num/2;
+     playHit('ramp',l.next,accent?1850:colors[l.i%colors.length],.014,accent?.86:(mid?.58:.34));
+     l.next+=60/(tempo*4/l.den);l.beat=(l.beat+1)%l.num;guard++;
+    }
+   }
+   tempoCurvesTimer=setTimeout(tick,20);
+  }catch(err){tempoCurvesActive=false;setStatus('tcStatus','Error en progresiones: '+(err&&err.message?err.message:'fallo de audio'))}
+ }
+ tick();
+}
+$('tcStartPlay').addEventListener('click',async()=>{try{await initAudio();stopTempoCurves();tempoCurvesActive=true;startTempoCurves()}catch(e){setStatus('tcStatus','Error de audio: '+e.message)}});
+$('tcStopPlay').addEventListener('click',()=>{stopTempoCurves();setStatus('tcStatus','Progresiones detenidas.')});
+
 function stopStructureAudio(){
  if(structureTimer!==null)clearTimeout(structureTimer);structureTimer=null;
  stopOscList(structureOscs);
@@ -793,6 +917,8 @@ $('recordPm').addEventListener('click',async()=>{try{await initAudio();startReco
 $('stopRecordPm').addEventListener('click',()=>stopRecording('pm'));
 $('recordPt').addEventListener('click',async()=>{try{await initAudio();startRecording('pt','ptRecordStatus','recordPt','stopRecordPt')}catch(e){setStatus('ptRecordStatus','Error: '+e.message)}});
 $('stopRecordPt').addEventListener('click',()=>stopRecording('pt'));
+$('recordRamp').addEventListener('click',async()=>{try{await initAudio();startRecording('ramp','tcRecordStatus','recordRamp','stopRecordRamp')}catch(e){setStatus('tcRecordStatus','Error: '+e.message)}});
+$('stopRecordRamp').addEventListener('click',()=>stopRecording('ramp'));
 
 document.addEventListener('visibilitychange',()=>{
  if(document.hidden){
@@ -800,6 +926,7 @@ document.addEventListener('visibilitychange',()=>{
   if(polyActive){polyActive=false;stopPolyAudio();stopSwing();setStatus('polyStatus','Polirritmia detenida al salir de la pestaña.')}
   if(polymeterActive){stopPolymeter();setStatus('pmStatus','Polimetría detenida al salir de la pestaña.')}
   if(polytempoActive){stopPolytempo();setStatus('ptStatus','Politempo detenido al salir de la pestaña.')}
+  if(tempoCurvesActive){stopTempoCurves();setStatus('tcStatus','Progresiones detenidas al salir de la pestaña.')}
   if(structureActive){structureActive=false;stopStructureAudio();setStatus('builderStatus','Estructura detenida al salir de la pestaña.')}
  }
 });
