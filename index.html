@@ -46,6 +46,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .voice-title{font-weight:800}
 .mute{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);white-space:nowrap}
 .segment{border:1px solid var(--line);background:#151821;border-radius:12px;padding:12px;margin:10px 0}
+.sampler-panel input[type=file]{display:block;width:100%;max-width:100%;margin:8px 0;color:var(--muted);font-size:14px}
+.sampler-panel .status{overflow-wrap:anywhere}
+.sampler-panel .grid3{margin-top:8px}
 .segment-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .segment-top button{margin:0;padding:8px 10px}
 .voice-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
@@ -61,7 +64,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 </head>
 <body>
 <header>
-  <div class="eyebrow">Laboratorio de ritmo · Versión ampliada</div>
+  <div class="eyebrow">Laboratorio de ritmo · Versión 4.2</div>
   <h1>Metrónomo Extremo 50K</h1>
   <p>Compases, acentos, polirritmias, polimetrías, politempos y estructuras rítmicas. Para mejores resultados, mantén esta página abierta mientras suena.</p>
   <nav class="tabs"><a href="#metro">1 · Metrónomo</a><a href="#poly">2 · Polirritmias</a><a href="#polymeter">3 · Polimetrías</a><a href="#polytempo">4 · Politempos</a><a href="#builder">5 · Estructuras</a></nav>
@@ -81,6 +84,23 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
   <p id="interval">Intervalo de negra: 500 ms</p>
   <p id="thresholdInfo" class="note"><strong>Cómo funciona el rango extremo:</strong> de 1 a 1,499 BPM se generan golpes separados. Desde 1,500 BPM se usa un tono continuo equivalente, porque los golpes se vuelven demasiado rápidos para distinguirlos con claridad. El intervalo de una negra se calcula como 60,000 ÷ BPM; a 50,000 BPM equivale a 1.2 ms.</p>
   <p class="note">Convención: el BPM indica negras por minuto. El metrónomo pulsa la figura del denominador: por ejemplo, en 6/8 escuchas seis corcheas por compás. El primer tiempo suena más fuerte; en compases compuestos puedes acentuar también el inicio del segundo grupo.</p>
+
+  <div class="segment sampler-panel" id="samplerPanelMetro">
+    <h3>Sampler de audio · Metrónomo</h3>
+    <label for="sampleFileMetro">Subir audio (MP3, WAV, M4A u otro formato compatible)</label>
+    <input id="sampleFileMetro" type="file" accept="audio/*">
+    <div class="grid3">
+      <div class="field"><label for="sampleStartMetro">Recorte desde (s)</label><input id="sampleStartMetro" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+      <div class="field"><label for="sampleEndMetro">Recorte hasta (s)</label><input id="sampleEndMetro" type="number" min="0.01" step="0.01" value="1" inputmode="decimal"></div>
+      <div class="field"><label>Duración</label><div id="sampleDurationMetro" class="status">Sin archivo</div></div>
+    </div>
+    <label class="mute"><input id="sampleUseMetro" type="checkbox" checked> Usar el fragmento como sonido de cada golpe</label>
+    <button type="button" class="secondary" id="samplePreviewMetro">▶ Escuchar fragmento</button>
+    <button type="button" class="secondary" id="sampleAnalyzeMetro">⌁ Estimar BPM</button>
+    <button type="button" class="secondary" id="sampleClearMetro">Quitar audio</button>
+    <div id="sampleStatusMetro" class="status">Sube un audio para recortar y usarlo como sampler.</div>
+  </div>
+
   <button id="start">▶ Iniciar metrónomo</button><button id="stop" class="secondary">■ Detener</button>
   <button id="recordMetro" class="secondary">● Grabar audio</button><button id="stopRecordMetro" class="danger" disabled>■ Terminar y guardar</button>
   <div id="status" class="status" role="status">Pulsa Iniciar para habilitar el audio.</div>
@@ -102,6 +122,23 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
     <div class="voice"><div class="voice-head"><span class="voice-title">Voz C</span><label class="mute"><input id="muteC" type="checkbox" checked> Activa</label></div><label for="c">Ataques/ciclo</label><input id="c" type="number" min="0" max="16" value="5" inputmode="numeric"><p class="note">0 = silencio</p></div>
     <div class="voice"><div class="voice-head"><span class="voice-title">Voz D</span><label class="mute"><input id="muteD" type="checkbox" checked> Activa</label></div><label for="d">Ataques/ciclo</label><input id="d" type="number" min="0" max="16" value="4" inputmode="numeric"><p class="note">0 = silencio</p></div>
   </div>
+
+  <div class="segment sampler-panel" id="samplerPanelPoly">
+    <h3>Sampler de audio · Polirritmias</h3>
+    <label for="sampleFilePoly">Subir audio (MP3, WAV, M4A u otro formato compatible)</label>
+    <input id="sampleFilePoly" type="file" accept="audio/*">
+    <div class="grid3">
+      <div class="field"><label for="sampleStartPoly">Recorte desde (s)</label><input id="sampleStartPoly" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+      <div class="field"><label for="sampleEndPoly">Recorte hasta (s)</label><input id="sampleEndPoly" type="number" min="0.01" step="0.01" value="1" inputmode="decimal"></div>
+      <div class="field"><label>Duración</label><div id="sampleDurationPoly" class="status">Sin archivo</div></div>
+    </div>
+    <label class="mute"><input id="sampleUsePoly" type="checkbox" checked> Usar el fragmento como sonido de cada golpe</label>
+    <button type="button" class="secondary" id="samplePreviewPoly">▶ Escuchar fragmento</button>
+    <button type="button" class="secondary" id="sampleAnalyzePoly">⌁ Estimar BPM</button>
+    <button type="button" class="secondary" id="sampleClearPoly">Quitar audio</button>
+    <div id="sampleStatusPoly" class="status">Sube un audio para recortar y usarlo como sampler.</div>
+  </div>
+
   <button id="polyStart">▶ Iniciar polirritmia</button><button id="polyStop" class="secondary">■ Detener</button>
   <button id="recordPoly" class="secondary">● Grabar audio</button><button id="stopRecordPoly" class="danger" disabled>■ Terminar y guardar</button>
   <div id="polyStatus" class="status">Relación 3:2:5:4 · elige las voces que quieras escuchar.</div>
@@ -112,34 +149,72 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 
 <section class="panel" id="polymeter">
   <h2>3. Polimetrías simultáneas</h2>
-  <p>Agrega de 1 a 6 compases distintos para que suenen simultáneamente al mismo tempo. Cada línea conserva su propio ciclo y acentúa el inicio de su compás.</p>
+  <p>Agrega hasta 999 compases distintos para que suenen simultáneamente al mismo tempo. Cada línea conserva su propio ciclo y acentúa el inicio de su compás.</p>
   <div class="grid">
     <div class="field"><label for="pmTempo">Tempo común (BPM)</label><input id="pmTempo" type="number" min="1" max="50000" value="120" inputmode="numeric"></div>
     <div class="field"><label for="pmNum">Numerador del nuevo compás</label><select id="pmNum"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>15</option><option>16</option></select></div>
     <div class="field"><label for="pmDen">Denominador</label><select id="pmDen"><option>2</option><option selected>4</option><option>8</option><option>16</option></select></div>
     <div class="field" style="align-self:end"><button id="pmAdd" type="button">＋ Agregar compás</button></div>
   </div>
-  <h3>Compases simultáneos <span class="note">(máximo 6)</span></h3>
+  <h3>Compases simultáneos <span class="note">(máximo 999)</span></h3>
   <div id="pmList"><p class="note" id="pmEmpty">Agrega el primer compás para comenzar.</p></div>
+
+  <div class="segment sampler-panel" id="samplerPanelPm">
+    <h3>Sampler de audio · Polimetrías</h3>
+    <label for="sampleFilePm">Subir audio (MP3, WAV, M4A u otro formato compatible)</label>
+    <input id="sampleFilePm" type="file" accept="audio/*">
+    <div class="grid3">
+      <div class="field"><label for="sampleStartPm">Recorte desde (s)</label><input id="sampleStartPm" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+      <div class="field"><label for="sampleEndPm">Recorte hasta (s)</label><input id="sampleEndPm" type="number" min="0.01" step="0.01" value="1" inputmode="decimal"></div>
+      <div class="field"><label>Duración</label><div id="sampleDurationPm" class="status">Sin archivo</div></div>
+    </div>
+    <label class="mute"><input id="sampleUsePm" type="checkbox" checked> Usar el fragmento como sonido de cada golpe</label>
+    <button type="button" class="secondary" id="samplePreviewPm">▶ Escuchar fragmento</button>
+    <button type="button" class="secondary" id="sampleAnalyzePm">⌁ Estimar BPM</button>
+    <button type="button" class="secondary" id="sampleClearPm">Quitar audio</button>
+    <div id="sampleStatusPm" class="status">Sube un audio para recortar y usarlo como sampler.</div>
+  </div>
+
   <button id="pmStart">▶ Iniciar polimetría</button><button id="pmStop" class="secondary">■ Detener</button>
+  <button id="recordPm" class="secondary">● Grabar audio</button><button id="stopRecordPm" class="danger" disabled>■ Terminar y guardar</button>
   <div id="pmStatus" class="status">Cada compás tendrá su propio ciclo de acentos.</div>
-  <p class="note">El BPM común representa negras por minuto. En cada línea, el denominador define la figura del pulso y el numerador determina cuántos pulsos tiene su compás.</p>
+  <div id="pmRecordStatus" class="status"></div>
+  <p class="note">El BPM común representa negras por minuto. En cada línea, el denominador define la figura del pulso y el numerador determina cuántos pulsos tiene su compás. Puedes configurar hasta 999 líneas; en iPhone, la reproducción simultánea de cientos de líneas puede exceder los recursos disponibles. Empieza con pocas y aumenta gradualmente.</p>
 </section>
 
 <section class="panel" id="polytempo">
   <h2>4. Politempos simultáneos</h2>
-  <p>Agrega de 1 a 6 líneas con tempos independientes. Cada línea puede tener también su propio compás para marcar los acentos mientras los tempos avanzan en paralelo.</p>
+  <p>Agrega hasta 999 líneas con tempos independientes. Cada línea puede tener también su propio compás para marcar los acentos mientras los tempos avanzan en paralelo.</p>
   <div class="grid">
     <div class="field"><label for="ptBpm">BPM de la nueva línea</label><input id="ptBpm" type="number" min="1" max="50000" value="120" inputmode="numeric"></div>
     <div class="field"><label for="ptNum">Numerador</label><select id="ptNum"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>15</option><option>16</option></select></div>
     <div class="field"><label for="ptDen">Denominador</label><select id="ptDen"><option>2</option><option selected>4</option><option>8</option><option>16</option></select></div>
     <div class="field" style="align-self:end"><button id="ptAdd" type="button">＋ Agregar tempo</button></div>
   </div>
-  <h3>Tempos simultáneos <span class="note">(máximo 6)</span></h3>
+  <h3>Tempos simultáneos <span class="note">(máximo 999)</span></h3>
   <div id="ptList"><p class="note" id="ptEmpty">Agrega el primer tempo para comenzar.</p></div>
+
+  <div class="segment sampler-panel" id="samplerPanelPt">
+    <h3>Sampler de audio · Politempos</h3>
+    <label for="sampleFilePt">Subir audio (MP3, WAV, M4A u otro formato compatible)</label>
+    <input id="sampleFilePt" type="file" accept="audio/*">
+    <div class="grid3">
+      <div class="field"><label for="sampleStartPt">Recorte desde (s)</label><input id="sampleStartPt" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+      <div class="field"><label for="sampleEndPt">Recorte hasta (s)</label><input id="sampleEndPt" type="number" min="0.01" step="0.01" value="1" inputmode="decimal"></div>
+      <div class="field"><label>Duración</label><div id="sampleDurationPt" class="status">Sin archivo</div></div>
+    </div>
+    <label class="mute"><input id="sampleUsePt" type="checkbox" checked> Usar el fragmento como sonido de cada golpe</label>
+    <button type="button" class="secondary" id="samplePreviewPt">▶ Escuchar fragmento</button>
+    <button type="button" class="secondary" id="sampleAnalyzePt">⌁ Estimar BPM</button>
+    <button type="button" class="secondary" id="sampleClearPt">Quitar audio</button>
+    <div id="sampleStatusPt" class="status">Sube un audio para recortar y usarlo como sampler.</div>
+  </div>
+
   <button id="ptStart">▶ Iniciar politempo</button><button id="ptStop" class="secondary">■ Detener</button>
+  <button id="recordPt" class="secondary">● Grabar audio</button><button id="stopRecordPt" class="danger" disabled>■ Terminar y guardar</button>
   <div id="ptStatus" class="status">Cada línea tendrá un tempo y un ciclo de acentos independientes.</div>
-  <p class="note">Los BPM indican negras por minuto. Si una línea alcanza 1,500 BPM o más, usa un tono continuo equivalente en lugar de golpes separados.</p>
+  <div id="ptRecordStatus" class="status"></div>
+  <p class="note">Los BPM indican negras por minuto. Si una línea alcanza 1,500 BPM o más, usa un tono continuo equivalente en lugar de golpes separados. Puedes configurar hasta 999 líneas, aunque reproducir cientos simultáneamente puede sobrecargar el dispositivo; aumenta la cantidad poco a poco.</p>
 </section>
 
 <section class="panel" id="builder">
@@ -153,6 +228,23 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
       <div class="field"><label for="secDen">Denominador</label><select id="secDen"><option >2</option><option selected>4</option><option >8</option><option >16</option></select></div>
       <div class="field"><label for="secBars">Número de compases</label><input id="secBars" type="number" min="1" max="128" value="4" inputmode="numeric"></div>
     </div>
+  
+  <div class="segment sampler-panel" id="samplerPanelStructure">
+    <h3>Sampler de audio · Estructuras rítmicas</h3>
+    <label for="sampleFileStructure">Subir audio (MP3, WAV, M4A u otro formato compatible)</label>
+    <input id="sampleFileStructure" type="file" accept="audio/*">
+    <div class="grid3">
+      <div class="field"><label for="sampleStartStructure">Recorte desde (s)</label><input id="sampleStartStructure" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+      <div class="field"><label for="sampleEndStructure">Recorte hasta (s)</label><input id="sampleEndStructure" type="number" min="0.01" step="0.01" value="1" inputmode="decimal"></div>
+      <div class="field"><label>Duración</label><div id="sampleDurationStructure" class="status">Sin archivo</div></div>
+    </div>
+    <label class="mute"><input id="sampleUseStructure" type="checkbox" checked> Usar el fragmento como sonido de cada golpe</label>
+    <button type="button" class="secondary" id="samplePreviewStructure">▶ Escuchar fragmento</button>
+    <button type="button" class="secondary" id="sampleAnalyzeStructure">⌁ Estimar BPM</button>
+    <button type="button" class="secondary" id="sampleClearStructure">Quitar audio</button>
+    <div id="sampleStatusStructure" class="status">Sube un audio para recortar y usarlo como sampler.</div>
+  </div>
+
     <button type="button" id="togglePoly" class="secondary">＋ Agregar polirritmias</button>
     <div id="sectionPolyEditor" hidden>
       <p class="note">Añade una o dos voces por compás. El número indica cuántos ataques distribuidos uniformemente tendrá cada voz dentro de cada compás.</p>
@@ -194,7 +286,7 @@ let polyActive=false,polyTimer=null,polyNext=[],polyOscs=[],swingFrame=null,swin
 let polymeterActive=false,polymeterTimer=null,polymeterOscs=[],polymeterLanes=[];
 let polytempoActive=false,polytempoTimer=null,polytempoOscs=[],polytempoLanes=[];
 let structureActive=false,structureTimer=null,structureOscs=[],structureStartedAt=0;
-let recorders={metro:null,poly:null,structure:null},recordChunks={metro:[],poly:[],structure:[]};
+let recorders={metro:null,poly:null,pm:null,pt:null,structure:null},recordChunks={metro:[],poly:[],pm:[],pt:[],structure:[]};
 
 function clampInt(v,min,max,def){const n=Number(v);return Number.isFinite(n)?Math.max(min,Math.min(max,Math.round(n))):def}
 function bpm(v){return clampInt(v,1,MAX,120)}
@@ -228,6 +320,65 @@ function clickAt(t,f=1000,d=.012,v=.6){
  g.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.004,d));
  o.connect(g);g.connect(master);o.start(t);o.stop(t+Math.max(.006,d+.004));
 }
+// Samplers locales: cada módulo mantiene su propio audio y región de recorte.
+const samplers={Metro:null,Poly:null,Pm:null,Pt:null,Structure:null};
+function sampleKeyForModule(key){return key==='metro'?'Metro':key==='poly'?'Poly':key==='pm'?'Pm':key==='pt'?'Pt':'Structure'}
+function sampleTrim(key){
+ const s=samplers[key];if(!s)return null;
+ const start=Math.max(0,Math.min(s.buffer.duration-.01,Number($('sampleStart'+key).value)||0));
+ let end=Number($('sampleEnd'+key).value);if(!Number.isFinite(end)||end<=start)end=Math.min(s.buffer.duration,start+.1);
+ end=Math.max(start+.01,Math.min(s.buffer.duration,end));
+ return {start,end,duration:end-start};
+}
+function playHit(moduleKey,t,freq=1000,d=.012,level=.5){
+ const key=sampleKeyForModule(moduleKey),s=samplers[key];
+ if(!s||!$('sampleUse'+key).checked){clickAt(t,freq,d,level);return}
+ const trim=sampleTrim(key);if(!trim){clickAt(t,freq,d,level);return}
+ try{
+  const src=ac.createBufferSource(),g=ac.createGain();src.buffer=s.buffer;g.gain.setValueAtTime(Math.max(.02,Math.min(1,level*1.15)),t);src.connect(g);g.connect(master);
+  src.start(t,trim.start,trim.duration);src.stop(t+trim.duration+.005);
+ }catch(e){clickAt(t,freq,d,level)}
+}
+function renderSamplerState(key){
+ const s=samplers[key];$('sampleDuration'+key).textContent=s?s.buffer.duration.toFixed(2)+' s':'Sin archivo';
+ if(s){$('sampleStart'+key).max=Math.max(0,s.buffer.duration-.01);$('sampleEnd'+key).max=s.buffer.duration;$('sampleEnd'+key).value=Math.min(s.buffer.duration,Math.max(.01,Number($('sampleEnd'+key).value)||Math.min(1,s.buffer.duration))).toFixed(2);}
+}
+async function loadSampler(key,file){
+ if(!file)return;
+ try{
+  await initAudio();const data=await file.arrayBuffer();const buffer=await ac.decodeAudioData(data.slice(0));
+  samplers[key]={buffer,name:file.name};$('sampleStart'+key).value='0';$('sampleEnd'+key).value=Math.min(1,buffer.duration).toFixed(2);renderSamplerState(key);
+  setStatus('sampleStatus'+key,`Audio cargado: ${file.name} · ${buffer.duration.toFixed(2)} s. Ajusta el recorte y escucha la vista previa.`);
+ }catch(e){setStatus('sampleStatus'+key,'No se pudo leer este audio. Prueba con MP3, WAV o M4A compatible con Safari.');}
+}
+function previewSampler(key){
+ const s=samplers[key];if(!s){setStatus('sampleStatus'+key,'Primero sube un archivo de audio.');return}
+ initAudio().then(()=>{const tr=sampleTrim(key),src=ac.createBufferSource(),g=ac.createGain();src.buffer=s.buffer;g.gain.value=.8;src.connect(g);g.connect(master);src.start(ac.currentTime+.03,tr.start,tr.duration);setStatus('sampleStatus'+key,`Reproduciendo recorte de ${tr.start.toFixed(2)} a ${tr.end.toFixed(2)} s.`)}).catch(e=>setStatus('sampleStatus'+key,'Error de audio: '+e.message));
+}
+function estimateBpm(buffer){
+ // Estimación aproximada por autocorrelación de energía en la envolvente; no identifica de forma fiable compases o capas simultáneas.
+ const data=buffer.getChannelData(0),sr=buffer.sampleRate,hop= Math.max(1,Math.floor(sr/200)),env=[];
+ for(let i=0;i<data.length;i+=hop){let sum=0,n=Math.min(hop,data.length-i);for(let j=0;j<n;j++)sum+=data[i+j]*data[i+j];env.push(Math.sqrt(sum/Math.max(1,n)));}
+ if(env.length<80)return null;
+ const mean=env.reduce((a,b)=>a+b,0)/env.length;for(let i=0;i<env.length;i++)env[i]=Math.max(0,env[i]-mean);
+ let best={score:-Infinity,bpm:0};const frameRate=sr/hop;
+ for(let candidate=40;candidate<=240;candidate++){
+  const lag=Math.round(frameRate*60/candidate);if(lag<1||lag>=env.length/2)continue;
+  let score=0,n=0;for(let i=lag;i<env.length;i++){score+=env[i]*env[i-lag];n++}score/=Math.max(1,n);
+  // also check half/double-time candidates through candidate range; choose highest autocorrelation score
+  if(score>best.score)best={score,bpm:candidate};
+ }
+ return best.bpm||null;
+}
+function setupSampler(key){
+ $('sampleFile'+key).addEventListener('change',e=>loadSampler(key,e.target.files&&e.target.files[0]));
+ $('samplePreview'+key).addEventListener('click',()=>previewSampler(key));
+ $('sampleAnalyze'+key).addEventListener('click',()=>{const s=samplers[key];if(!s){setStatus('sampleStatus'+key,'Primero sube un archivo de audio.');return}const result=estimateBpm(s.buffer);setStatus('sampleStatus'+key,result?`Estimación automática: aproximadamente ${result} BPM. Verifica el resultado escuchando; es una estimación, no una detección garantizada.`:'No hay suficiente información rítmica para estimar el BPM.');});
+ $('sampleClear'+key).addEventListener('click',()=>{samplers[key]=null;$('sampleFile'+key).value='';$('sampleStart'+key).value='0';$('sampleEnd'+key).value='1';$('sampleDuration'+key).textContent='Sin archivo';setStatus('sampleStatus'+key,'Sampler quitado; se usarán los sonidos internos.');});
+ ['sampleStart'+key,'sampleEnd'+key].forEach(id=>$(id).addEventListener('change',()=>{const s=samplers[key];if(!s)return;const tr=sampleTrim(key);$('sampleStart'+key).value=tr.start.toFixed(2);$('sampleEnd'+key).value=tr.end.toFixed(2)}));
+}
+['Metro','Poly','Pm','Pt','Structure'].forEach(setupSampler);
+
 function sustained(freq,gain=.08){
  const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=Math.max(20,Math.min(18000,freq));g.gain.value=gain;o.connect(g);g.connect(master);o.start();return {o,g};
 }
@@ -254,7 +405,7 @@ function scheduleMetro(){
  while(metroNext<ac.currentTime+AHEAD){
   const beat=metroBeat%m.num,level=accentLevel(beat,m.num,m.den);
   const freq=beat===0?1500:(level>.6?1150:850);
-  clickAt(metroNext,freq,.014,level);
+  playHit('metro',metroNext,freq,.014,level);
   metroNext+=step;metroBeat++;
  }
  metroTimer=setTimeout(scheduleMetro,LOOK);
@@ -309,7 +460,7 @@ function startPolyScheduler(){
    const interval=cycle/v.count;
    while(polyNext[i]<now+AHEAD){
     const pos=Math.round((polyNext[i]-(ac.currentTime-.05))/interval);
-    clickAt(polyNext[i],v.freq,.009,v.level);
+    playHit('poly',polyNext[i],v.freq,.009,v.level);
     polyNext[i]+=interval;
    }
   });
@@ -339,7 +490,7 @@ function renderPolymeterRows(){
  });
 }
 $('pmAdd').addEventListener('click',()=>{
- if(polymeterRows.length>=6){setStatus('pmStatus','Ya tienes el máximo de 6 compases simultáneos.');return}
+ if(polymeterRows.length>=999){setStatus('pmStatus','Llegaste al máximo de 999 compases.');return}
  polymeterRows.push({num:clampInt($('pmNum').value,1,16,4),den:clampInt($('pmDen').value,2,16,4)});
  renderPolymeterRows();setStatus('pmStatus',`Añadidos ${polymeterRows.length} compás(es). Pulsa Iniciar polimetría para escucharlos.`);
 });
@@ -379,7 +530,7 @@ function startPolymeterScheduler(){
     while(l.next < now + AHEAD){
      const isOne=l.beat===0;
      const isMid=l.num>=6&&l.num%3===0&&l.beat===l.num/2;
-     clickAt(l.next,isOne?1800:colors[l.i],.014,isOne?.88:(isMid?.58:.34));
+     playHit('pm',l.next,isOne?1800:colors[l.i],.014,isOne?.88:(isMid?.58:.34));
      l.next += l.interval;
      l.beat=(l.beat+1)%l.num;
     }
@@ -411,7 +562,7 @@ function renderPolytempoRows(){
  });
 }
 $('ptAdd').addEventListener('click',()=>{
- if(polytempoRows.length>=6){setStatus('ptStatus','Ya tienes el máximo de 6 tempos simultáneos.');return}
+ if(polytempoRows.length>=999){setStatus('ptStatus','Llegaste al máximo de 999 líneas de tempo.');return}
  polytempoRows.push({tempo:bpm($('ptBpm').value),num:clampInt($('ptNum').value,1,16,4),den:clampInt($('ptDen').value,2,16,4)});
  renderPolytempoRows();setStatus('ptStatus',`Añadidas ${polytempoRows.length} línea(s) de tempo. Pulsa Iniciar politempo para escucharlas.`);
 });
@@ -448,7 +599,7 @@ function startPolytempoScheduler(){
     while(l.next < now + AHEAD){
      const isOne=l.beat===0;
      const isMid=l.num>=6&&l.num%3===0&&l.beat===l.num/2;
-     clickAt(l.next,isOne?1900:colors[l.i],.014,isOne?.88:(isMid?.58:.34));
+     playHit('pt',l.next,isOne?1900:colors[l.i],.014,isOne?.88:(isMid?.58:.34));
      l.next += l.interval;
      l.beat=(l.beat+1)%l.num;
     }
@@ -539,7 +690,7 @@ function playStructure(){
   const horizon=ac.currentTime+AHEAD;
   while(eventIndex<structureEvents.length&&origin+structureEvents[eventIndex].t<horizon){
    const e=structureEvents[eventIndex++],t=origin+e.t;
-   if(e.type==='click')clickAt(t,e.freq,e.duration,e.gain);
+   if(e.type==='click')playHit('structure',t,e.freq,e.duration,e.gain);
    else if(e.type==='tone')scheduleToneAt(e.freq,e.gain,t,origin+e.end);
   }
   if(eventIndex>=structureEvents.length){structureActive=false;setStatus('builderStatus','Estructura integrada terminada.');return}
@@ -558,9 +709,14 @@ async function downloadIntegratedWav(){
   const off=new Offline(1,frames,sampleRate),out=off.createGain();out.gain.value=.25;out.connect(off.destination);
   structureEvents.forEach(e=>{
    if(e.type==='click'){
-    const o=off.createOscillator(),g=off.createGain();o.type='sine';o.frequency.value=e.freq;
-    const t=Math.max(0,e.t),dur=e.duration||.012;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(Math.min(.95,e.gain),t+.001);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-    o.connect(g);g.connect(out);o.start(t);o.stop(Math.min(integratedDuration+.14,t+dur+.004));
+    const sampler=samplers.Structure;
+    if(sampler && $('sampleUseStructure').checked){
+     const tr=sampleTrim('Structure'),src=off.createBufferSource(),g=off.createGain();src.buffer=sampler.buffer;g.gain.value=Math.max(.02,Math.min(.95,e.gain*1.15));src.connect(g);g.connect(out);src.start(Math.max(0,e.t),tr.start,tr.duration);
+    }else{
+     const o=off.createOscillator(),g=off.createGain();o.type='sine';o.frequency.value=e.freq;
+     const t=Math.max(0,e.t),dur=e.duration||.012;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(Math.min(.95,e.gain),t+.001);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+     o.connect(g);g.connect(out);o.start(t);o.stop(Math.min(integratedDuration+.14,t+dur+.004));
+    }
    }else{
     const o=off.createOscillator(),g=off.createGain();o.type='sine';o.frequency.value=Math.max(20,Math.min(18000,e.freq));
     const t=Math.max(0,e.t),end=Math.min(integratedDuration+.14,e.end);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(Math.min(.95,e.gain),Math.min(end,t+.008));g.gain.setValueAtTime(Math.min(.95,e.gain),Math.max(t+.009,end-.02));g.gain.exponentialRampToValueAtTime(.0001,Math.max(t+.01,end));
@@ -628,6 +784,10 @@ $('recordMetro').addEventListener('click',async()=>{try{await initAudio();startR
 $('stopRecordMetro').addEventListener('click',()=>stopRecording('metro'));
 $('recordPoly').addEventListener('click',async()=>{try{await initAudio();startRecording('poly','polyRecordStatus','recordPoly','stopRecordPoly')}catch(e){setStatus('polyRecordStatus','Error: '+e.message)}});
 $('stopRecordPoly').addEventListener('click',()=>stopRecording('poly'));
+$('recordPm').addEventListener('click',async()=>{try{await initAudio();startRecording('pm','pmRecordStatus','recordPm','stopRecordPm')}catch(e){setStatus('pmRecordStatus','Error: '+e.message)}});
+$('stopRecordPm').addEventListener('click',()=>stopRecording('pm'));
+$('recordPt').addEventListener('click',async()=>{try{await initAudio();startRecording('pt','ptRecordStatus','recordPt','stopRecordPt')}catch(e){setStatus('ptRecordStatus','Error: '+e.message)}});
+$('stopRecordPt').addEventListener('click',()=>stopRecording('pt'));
 
 document.addEventListener('visibilitychange',()=>{
  if(document.hidden){
