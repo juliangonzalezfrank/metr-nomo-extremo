@@ -64,6 +64,28 @@ button:disabled{opacity:.45;cursor:not-allowed}
 
 hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 @media(max-width:560px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}.grid4,.voice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:13px}.big{font-size:clamp(2.2rem,12vw,3.5rem)}}
+
+/* Rediseño adaptable: escritorio, tablet y móvil */
+:root{--bg:#0d1016;--panel:#171c25;--line:#303948;--muted:#aeb8c7;--accent:#f0f2f5;--green:#b8e4c8;--blue:#8cc8ff;--coral:#ff9b91;--gold:#e8d6b5}
+body{max-width:1180px;padding:clamp(14px,2.8vw,32px) clamp(12px,2.2vw,28px) 56px;background:radial-gradient(ellipse at 50% -20%,#202938 0%,var(--bg) 54%);line-height:1.45}
+header{padding:8px 2px 20px}.brand-lockup{padding:12px 0 20px;gap:20px}.brand-mark{width:88px;height:88px;flex-basis:88px}
+.brand-lockup h1{font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.045em}.brand-sub{max-width:720px}
+.tabs{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(13,16,22,.92);backdrop-filter:blur(14px);border-bottom:1px solid #303948}
+.tabs a{background:#1d2430;border:1px solid #303948;transition:background .2s,border-color .2s}.tabs a:hover{background:#2a3545;border-color:#8cc8ff}
+.panel{padding:clamp(15px,2.3vw,26px);margin:18px 0;border-radius:20px;box-shadow:0 10px 32px #00000017}
+.panel h2{font-size:clamp(1.25rem,2.1vw,1.65rem);letter-spacing:-.02em;margin-bottom:12px}
+input[type=number],select{min-height:46px;background:#0f141c;border-color:#394454}input:focus,select:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button{transition:transform .15s,filter .15s,background .15s;min-height:44px}button:hover{filter:brightness(1.1)}button:active{transform:translateY(1px)}
+.grid,.grid3,.grid4{align-items:start}.segment{border-color:#333e4e;border-radius:15px;background:linear-gradient(145deg,#151b24,#121720)}
+.voice{border-radius:15px;background:#111720}.sampler-panel{margin-top:18px}.note{line-height:1.5}
+.education{position:relative;overflow:hidden;background:linear-gradient(135deg,#1a2531 0%,#151b25 60%,#20251f 100%);border-color:#465365;padding:clamp(20px,4vw,38px)}
+.education:before{content:"";position:absolute;width:260px;height:260px;right:-95px;top:-110px;border:1px solid #8cc8ff33;border-radius:50%;box-shadow:0 0 0 22px #8cc8ff08,0 0 0 46px #8cc8ff05;pointer-events:none}
+.education-head{position:relative;max-width:780px}.education-head h2{font-size:clamp(1.7rem,4vw,2.6rem);line-height:1.08;letter-spacing:-.04em;margin:10px 0 14px}.education-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:24px 0;position:relative}
+.edu-card{border:1px solid #3a4656;background:#101720aa;border-radius:15px;padding:18px;min-width:0}.edu-icon{font-size:1.45rem;margin-bottom:12px}.edu-card h3{font-size:1rem}.edu-card p{font-size:.92rem;margin-bottom:0}.education-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;position:relative}.education-actions button{margin:0;background:var(--gold);color:#14171d;padding:14px 20px}.education-actions .secondary{background:#303a49;color:#fff}.education-foot{font-size:.8rem;color:#aeb8c7;margin:14px 0 0;position:relative}
+@media(min-width:900px){.tabs{gap:9px}.tabs a{font-size:.88rem}.panel#metro .grid{grid-template-columns:repeat(4,minmax(0,1fr))}.panel#poly .grid,.panel#polymeter .grid,.panel#polytempo .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.education-grid{grid-template-columns:1fr}.edu-card{padding:15px}.brand-lockup{align-items:flex-start}.brand-mark{width:64px;height:64px;flex-basis:64px}.tabs{position:static}.panel{margin:13px 0}}
+@media(max-width:420px){.brand-lockup{gap:11px}.brand-lockup h1{font-size:1.7rem}.brand-origin{font-size:.69rem}.tabs a{font-size:.8rem;padding:8px 10px}.education-actions{display:grid;grid-template-columns:1fr}.education-actions button{width:100%}}
+
 </style>
 </head>
 <body>
@@ -77,7 +99,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
       <circle cx="40" cy="40" r="5" fill="var(--green)"/>
       <circle cx="40" cy="16" r="3" fill="var(--blue)"/><circle cx="64" cy="40" r="3" fill="var(--blue)"/><circle cx="40" cy="64" r="3" fill="var(--blue)"/><circle cx="16" cy="40" r="3" fill="var(--blue)"/>
     </svg>
-    <div><div class="eyebrow">Exploración · Tiempo · Composición</div><h1>Laboratorio de Ritmo</h1><p class="brand-sub">Un entorno para investigar, diseñar y escuchar estructuras rítmicas.</p><span class="brand-origin">Metrónomo Extremo 50K · Versión 5.0</span></div>
+    <div><div class="eyebrow">Exploración · Tiempo · Composición</div><h1>Laboratorio de Ritmo</h1><p class="brand-sub">Un entorno para investigar, diseñar y escuchar estructuras rítmicas.</p><span class="brand-origin">Laboratorio de Ritmo · Versión 5.1</span></div>
   </div>
   <nav class="tabs"><a href="#metro">1 · Metrónomo</a><a href="#poly">2 · Polirritmias</a><a href="#polymeter">3 · Polimetrías</a><a href="#polytempo">4 · Politempos</a><a href="#tempoCurves">5 · Progresiones</a><a href="#builder">6 · Estructuras</a></nav>
 </header>
@@ -933,6 +955,38 @@ document.addEventListener('visibilitychange',()=>{
 $('accent').addEventListener('change',()=>syncTempo($('number').value));
 syncTempo(120);
 })();
+
+// Bloque educativo: deja el mensaje listo para compartir por el canal de contacto que prefieras.
+const educationMessage = 'Hola, me interesa conocer los cursos, talleres o asesorías de composición musical y exploración rítmica de Julián González Frank. Vengo del Laboratorio de Ritmo.';
+$('educationCopy').addEventListener('click',async()=>{
+ const status=$('educationStatus');
+ try{await navigator.clipboard.writeText(educationMessage);status.textContent='Mensaje copiado. Puedes pegarlo en WhatsApp, correo o tu canal de contacto preferido.'}
+ catch(e){status.textContent=educationMessage}
+});
+$('educationContact').addEventListener('click',()=>{
+ const status=$('educationStatus');
+ status.textContent='¡Gracias por tu interés! Copia el mensaje con el botón de al lado y envíamelo por tu canal de contacto preferido.';
+ document.getElementById('educationCopy').focus();
+});
 </script>
+
+<section class="panel education" id="aprende">
+  <div class="education-head">
+    <div class="eyebrow">Del laboratorio a tu música</div>
+    <h2>¿Quieres llevar tus experimentos más lejos?</h2>
+    <p>Explora cómo convertir la polirritmia, las relaciones de tempo y las estructuras musicales en herramientas para desarrollar tu propio lenguaje compositivo.</p>
+  </div>
+  <div class="education-grid">
+    <article class="edu-card"><div class="edu-icon" aria-hidden="true">◉</div><h3>Cursos de composición</h3><p>Aprende a transformar ideas, ritmo, armonía y forma en música propia mediante la Composición Musical Integral.</p></article>
+    <article class="edu-card"><div class="edu-icon" aria-hidden="true">⌁</div><h3>Talleres de ritmo</h3><p>Investiga polirritmia, polimetría, politempos y progresiones temporales con ejercicios prácticos.</p></article>
+    <article class="edu-card"><div class="edu-icon" aria-hidden="true">✳</div><h3>Asesorías personalizadas</h3><p>Trabaja tus ideas y proyectos musicales con acompañamiento individual y herramientas compositivas.</p></article>
+  </div>
+  <div class="education-actions">
+    <button type="button" id="educationContact">Aprende conmigo ↗</button>
+    <button type="button" class="secondary" id="educationCopy">Copiar mensaje de contacto</button>
+  </div>
+  <p class="education-foot" id="educationStatus" role="status">Laboratorio de Ritmo es una herramienta de exploración. La formación te ayuda a llevar estos conceptos a tu práctica musical.</p>
+</section>
+
 </body>
 </html>
